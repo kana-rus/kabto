@@ -21,7 +21,7 @@ const _: (/* html tag impls */) = {
         fn into_html(self) -> HTML {
             HTML(format!(
                 "<html{}>{}</html>",
-                if let Some(lang) = self.lang {lang} else {""},
+                if let Some(lang) = self.lang {format!(r#" lang="{lang}""#)} else {String::new()},
                 self.children.0
             ))
         }
