@@ -9,14 +9,6 @@ pub struct html {
 }
 
 const _: (/* html tag impls */) = {
-    impl<Children: IntoHTML> Sub<Children> for html {
-        type Output = HTML;
-        fn sub(mut self, children: Children) -> Self::Output {
-            self.children = children.into_html();
-            self.into_html()
-        }
-    }
-
     impl IntoHTML for html {
         fn into_html(self) -> HTML {
             HTML(format!(

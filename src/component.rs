@@ -1,9 +1,11 @@
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, ops::Sub};
 use crate::{config::Config, Result};
 
 pub trait Component {
     fn render(self) -> impl IntoHTML;
 }
+pub trait ParentCopmonent<Children: IntoHTML> = Sub<Children, Output = HTML>;
+
 pub trait IntoHTML {
     fn into_html(self) -> HTML;
 }

@@ -1,4 +1,6 @@
 pub mod html;
+pub mod head;
+pub mod title;
 pub mod meta;
 pub mod body;
 pub mod header;
