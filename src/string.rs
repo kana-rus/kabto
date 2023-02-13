@@ -1,4 +1,4 @@
-use kabto_macros::html_escape;
+use crate::internal_macros::html_escape;
 
 pub(crate) fn escaped(mut text: String) -> String {
     html_escape!(text by [
