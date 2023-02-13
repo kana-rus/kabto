@@ -1,5 +1,5 @@
 pub enum Error {
-    FailedToWriteFile(String),
+    FailedToIO(String),
     InvalidTomlSyntax(String),
     UnknownConfigTable(String),
     UnknownConfigKey {config: String, key: String},
@@ -8,7 +8,7 @@ pub enum Error {
 const _: (/* Error impls */) = {
     impl From<std::io::Error> for Error {
         fn from(value: std::io::Error) -> Self {
-            Self::FailedToWriteFile(value.to_string())
+            Self::FailedToIO(value.to_string())
         }
     }
 };
