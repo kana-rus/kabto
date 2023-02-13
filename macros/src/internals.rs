@@ -8,7 +8,7 @@ trait Build {
     fn build(self) -> TokenStream;
 }
 
-mod escape;
+mod html_escape;
 pub(super) fn html_escape(input: TokenStream) -> Result<TokenStream> {
-    Ok(parse2::<escape::HtmlEscape>(input)?.build())
+    Ok(parse2::<html_escape::HtmlEscape>(input)?.build())
 }

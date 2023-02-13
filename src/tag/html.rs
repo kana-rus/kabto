@@ -1,5 +1,4 @@
-use std::ops::Sub;
-use crate::component::{HTML, IntoHTML};
+use crate::html::{HTML, IntoHTML};
 
 #[allow(non_camel_case_types)]
 pub struct html { 

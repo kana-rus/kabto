@@ -1,12 +1,12 @@
 use proc_macro2::{TokenStream, Ident};
 use quote::{quote, ToTokens};
-use syn::{parse::Parse, LitChar, LitInt, token, bracketed};
+use syn::{parse::Parse, LitChar, LitStr, token, bracketed};
 use super::Build;
 
 /// ```
 /// escape!(text by [
-///     '\t': 9,
-///     '\n': 10,
+///     '\t': "Tab"
+///     '\n': "NewLine"
 /// 
 ///     //...
 /// ]);
@@ -16,18 +16,18 @@ use super::Build;
 /// let mut pos = usize;
 /// for ch in &mut text.clone().chars() {
 ///     match ch {
-///         '\t' => {text.replace_range(pos..=pos, "&#9"); pos += 3},
-///         '\n' => {"text.replace_range(pos..=pos, "&#10"); pos += 4},
+///         '\t' => {text.replace_range(pos..=pos, "&Tab;"); pos += 5}
+///         '\n' => {"text.replace_range(pos..=pos, "&NewLine;"); pos += 9}
 /// 
 ///         // ...
 /// 
-///         _ => ()
+///         _ => pos += 1
 ///     }
 /// }
 /// ```
 pub(super) struct HtmlEscape {
     text_name: Ident,
-    pairs: Vec<(char, usize)>,
+    pairs: Vec<(char, String)>,
 }
 
 mod keyword {
@@ -46,9 +46,9 @@ impl Parse for HtmlEscape {
             while !pairs_buf.is_empty() {
                 let from = pairs_buf.parse::<LitChar>()?.value();
                 pairs_buf.parse::<token::Colon>()?;
-                let id = pairs_buf.parse::<LitInt>()?.base10_parse()?;
+                let entity_name = pairs_buf.parse::<LitStr>()?.value();
 
-                pairs.push((from, id))
+                pairs.push((from, entity_name))
             }
             pairs
         };
@@ -62,8 +62,8 @@ impl Build for HtmlEscape {
         let HtmlEscape { text_name, pairs } = self;
         let pairs = pairs.into_iter().fold(
             TokenStream::new(), |mut it, next| {
-                let (from, id) = next;
-                let to = format!("&#{id};");
+                let (from, entity_name) = next;
+                let to = format!("&{entity_name};");
                 let to_len = to.len();
 
                 quote!{
@@ -79,7 +79,7 @@ impl Build for HtmlEscape {
             for ch in &mut #text_name.clone().chars() {
                 match ch {
                     #pairs
-                    _ => ()
+                    _ => pos += 1
                 }
             }
         }

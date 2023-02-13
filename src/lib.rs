@@ -5,8 +5,9 @@
 )]
 
 pub mod tag;
-pub mod component;
+pub mod html;
 pub mod string;
+pub mod component;
 
 mod error;
 mod config;
