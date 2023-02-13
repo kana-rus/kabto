@@ -5,7 +5,7 @@ pub trait Component {
     fn render(self) -> impl IntoHTML;
 }
 pub trait IntoHTML {
-    fn into(self) -> HTML;
+    fn into_html(self) -> HTML;
 }
 pub struct HTML(
     pub(crate) String
