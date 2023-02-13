@@ -1,18 +1,17 @@
-use std::{iter::Peekable, str::Lines};
-use crate::Result;
+use crate::{Result, config::FileContent};
 use super::{table::Table, map::Map};
 
-pub(crate) struct Toml<'lines>(
-    Map<'lines, Table<'lines>>
+pub(crate) struct Toml<'fc>(
+    Map<'fc, Table<'fc>>
 );
 
-pub(crate) trait FromToml<'lines>: Sized {
-    fn from_toml(toml: Toml<'lines>) -> Result<Self>;
+pub(crate) trait FromToml<'fc>: Sized {
+    fn from_toml(toml: Toml<'fc>) -> Result<Self>;
 }
 
 const _: (/* Toml impls */) = {
-    impl<'lines> Toml<'lines> {
-        pub fn parse(lines: &mut Peekable<Lines>) -> Result<Self> {
+    impl<'fc> Toml<'fc> {
+        pub fn parse(lines: &mut FileContent<'fc>) -> Result<Self> {
             let tables = {
                 let mut tables = Map::new();
 
@@ -32,9 +31,9 @@ const _: (/* Toml impls */) = {
         }
     }
     
-    impl<'lines> IntoIterator for Toml<'lines> {
-        type Item = <Map<'lines, Table<'lines>> as IntoIterator>::Item;
-        type IntoIter = <Map<'lines, Table<'lines>> as IntoIterator>::IntoIter;
+    impl<'fc> IntoIterator for Toml<'fc> {
+        type Item = <Map<'fc, Table<'fc>> as IntoIterator>::Item;
+        type IntoIter = <Map<'fc, Table<'fc>> as IntoIterator>::IntoIter;
         fn into_iter(self) -> Self::IntoIter {
             self.0.into_iter()
         }

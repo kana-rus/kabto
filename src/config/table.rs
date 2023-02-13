@@ -1,15 +1,14 @@
-use std::{str::Lines, iter::Peekable};
-use crate::{Result, error::Error};
+use crate::{Result, error::Error, config::FileContent};
 use super::{value::Value, map::Map};
 
-pub(super) struct Table<'lines> {
-    pub(super) name: &'lines str,
-    pub(super) key_values: Map<'lines, Value<'lines>>,
+pub(crate) struct Table<'fc> {
+    pub(crate) name: &'fc str,
+    pub(crate) key_values: Map<'fc, Value<'fc>>,
 }
 
 const _: (/* Table impls */) = {
-    impl<'lines> Table<'lines> {
-        pub(crate) fn parse(lines: &mut Peekable<Lines>) -> Result<Self> {
+    impl<'fc> Table<'fc> {
+        pub(crate) fn parse(lines: &mut FileContent<'fc>) -> Result<Self> {
             let name = {
                 let name_line = lines.next()
                     .ok_or_else(|| Error::InvalidTomlSyntax(String::from("table name is not found")))?;
@@ -46,9 +45,9 @@ const _: (/* Table impls */) = {
         }
     }
 
-    impl<'lines> IntoIterator for Table<'lines> {
-        type Item = <Map<'lines, Value<'lines>> as IntoIterator>::Item;
-        type IntoIter = <Map<'lines, Value<'lines>> as IntoIterator>::IntoIter;
+    impl<'fc> IntoIterator for Table<'fc> {
+        type Item = <Map<'fc, Value<'fc>> as IntoIterator>::Item;
+        type IntoIter = <Map<'fc, Value<'fc>> as IntoIterator>::IntoIter;
         fn into_iter(self) -> Self::IntoIter {
             self.key_values.into_iter()
         }
