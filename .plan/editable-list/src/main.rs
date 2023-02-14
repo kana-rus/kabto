@@ -9,13 +9,6 @@ struct EditbaleList {
     list_items:    Array<String>,
 }
 impl Component for EditableList {
-    fn on_connect(&self) {
-        let remove_element_buttons = self.shadow_root().query_selector_all<Button>(".editable-list-remove-item");
-        let add_element_button = self.shadow_root().query_selector<Button>(".editable-list-add-item");
-
-        self.handle_remove_item_listeners(remove_element_buttons);
-        add_element_button.add_event_listener(ClickEvent, self.add_list_item);
-    }
     fn render(self) -> impl HTML {
         div-[
             style-[
@@ -83,7 +76,7 @@ impl Component for EditableList {
                     display: "flex",
                     align_items: "center",
                     justify_content: "space-between",
-                    ..Default::default()
+                    ..CSS::default()
                 }),
                 style_for(".icon", CSS {
                     back_ground_color: "#fff",
@@ -91,7 +84,7 @@ impl Component for EditableList {
                     cursor: "pointer",
                     float: "right",
                     font_size: "1.8rem",
-                    ..Default::default()
+                    ..CSS::default()
                 })
             ],
             h3-[self.title],
@@ -99,7 +92,8 @@ impl Component for EditableList {
                 self.list_items._for(|item /*: String*/|
                     li-[
                         item,
-                        button.class("editable-list-remove-item icon")-[
+                        button.class("editable-list-remove-item icon")
+                        .on_click(self.remove_list_item)-[
                             "&ominus;"
                         ]
                     ]
@@ -108,7 +102,8 @@ impl Component for EditableList {
             div-[
                 label-[self.add_item_text],
                 input.class("add-new-list-item-input").input_type("text"),
-                button.class("editable-list-add-item icon")-[
+                button.class("editable-list-add-item icon")
+                .on_click(self.add_list_item)-[
                     "&oplus;"
                 ]
             ]
