@@ -16,7 +16,7 @@ pub(super) fn html_escape(input: TokenStream) -> Result<TokenStream> {
 
 mod css;
 pub(super) fn css(input: TokenStream) -> Result<TokenStream> {
-    Ok(parse2::<>(input)?)
+    Ok(parse2::<css::CSSInput>(input)?.build())
 }
 
 /// image:

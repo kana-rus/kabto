@@ -6,4 +6,7 @@ fn main() {
         ..Default::default()
     };
 
+    let _macro_css = css!(
+        display: flex;
+    );
 }

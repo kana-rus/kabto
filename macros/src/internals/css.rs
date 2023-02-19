@@ -1,16 +1,13 @@
-use std::collections::HashMap;
-
 use proc_macro2::{Ident, TokenStream};
 use quote::{quote, format_ident};
 use syn::{parse::Parse, token};
-
 use super::Build;
 
 pub(super) struct CSSInput(
     Vec<Property>
 ); struct Property {
     key:   Ident,
-    value: TokenStream,
+    value: Ident,
 }
 
 impl Parse for CSSInput {
