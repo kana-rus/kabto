@@ -1,4 +1,4 @@
-use crate::{Result, error::Error, config::FileContent};
+use crate::{Result, Error, config::FileContent};
 use super::{value::Value, map::Map};
 
 pub(crate) struct Table<'fc> {

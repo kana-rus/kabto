@@ -1,5 +1,5 @@
 use std::{collections::BTreeMap};
-use crate::{Result, error::Error};
+use crate::{Result, Error};
 
 pub(crate) struct Map<'lines, V>(
     BTreeMap<&'lines str, V>

@@ -1,5 +1,5 @@
 use std::fmt::Display;
-use crate::{Result, error::Error};
+use crate::{Result, Error};
 
 pub(crate) enum Value<'fc> {
     Str(&'fc str),

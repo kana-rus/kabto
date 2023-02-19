@@ -1,4 +1,4 @@
-use kabto::{html::HTML, component::Parent};
+use kabto::{html::HTML, html::Parent};
 
 fn main() {
     #[derive(Parent)]
@@ -12,7 +12,7 @@ fn _expanded() {
         children: HTML,
     }
     const _: () = {
-        impl<Children: kabto::html::IntoHTML> kabto::component::Parent<Children>
+        impl<Children: kabto::html::IntoHTML> kabto::html::Parent<Children>
         for Tag {
             fn set_children(&mut self, children: Children) {
                 self.children = children.into_html();

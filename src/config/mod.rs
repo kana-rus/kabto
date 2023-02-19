@@ -5,7 +5,7 @@ mod map;
 
 use std::{fs::File, io::Read, iter::Peekable, str::Lines};
 use once_cell::sync::Lazy;
-use crate::{Result, error::Error, config::toml::{Toml, FromToml}};
+use crate::{Result, Error, config::toml::{Toml, FromToml}};
 
 pub(crate) const CONFIG_FILE_NAME: &'static str = "kab.toml";
 static CONFIG_FILE_CONTENT: Lazy<Result<String>> = Lazy::new(|| {
