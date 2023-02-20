@@ -10,8 +10,8 @@ macro_rules! default {
     };
 }
 
-default!{AlignItems: normal}
-pub enum AlignItems {
+default!{align_items: normal}
+pub enum align_items {
     normal,
 
     stretch,
@@ -32,12 +32,12 @@ pub enum AlignItems {
     unset,
 }
 
-pub enum Color {
+pub enum color {
 
 }
 
-default!{Display: none}
-pub enum Display {
+default!{display: none}
+pub enum display {
     none,
 
     block,

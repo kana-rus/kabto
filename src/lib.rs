@@ -33,7 +33,7 @@ pub mod html;
 pub mod css;
 
 pub mod macros {
-    pub use kabto_macros::{Parent, css};
+    pub use kabto_macros::{Parent};
 }
 pub(crate) mod internal_macros {
     pub use kabto_macros::{ParentTag, html_escape};

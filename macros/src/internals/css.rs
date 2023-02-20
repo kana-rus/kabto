@@ -1,13 +1,24 @@
-use proc_macro2::{Ident, TokenStream};
-use quote::{quote, format_ident};
-use syn::{parse::Parse, token};
+use proc_macro2::{TokenStream, Span, Ident};
+use quote::{quote};
+use syn::{parse::Parse, token, Error};
 use super::Build;
 
 pub(super) struct CSSInput(
     Vec<Property>
 ); struct Property {
-    key:   Ident,
+    key:   Key,
     value: Ident,
+}
+#[allow(non_camel_case_types)]
+enum Key {
+    display,
+    align_items
+}
+mod property {
+    use syn::custom_keyword;
+
+    custom_keyword!(display);
+    custom_keyword!(align_items);
 }
 
 impl Parse for CSSInput {
@@ -29,51 +40,33 @@ impl Parse for Property {
         Ok(Self { key, value })
     }
 }
-
-/// keys of properties thats value is enum-type
-const P: &'static [&'static str] = &[
-    "align_items",
-    "display",
-];
-#[inline] fn completion_for(enum_type_key: &Ident) -> Option<TokenStream> {
-    if P.contains(&enum_type_key.to_string().as_str()) {
-        let enum_name = camel_cased(enum_type_key);
-        Some(quote!{ kabto::css::property::#enum_name:: })
-    } else {
-        None
+impl Parse for Key {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        if input.peek(property::align_items) {
+            input.parse::<property::align_items>().ok();
+            Ok(Self::align_items)
+        } else if input.peek(property::display) {
+            input.parse::<property::display>().ok();
+            Ok(Self::display)
+        } else {
+            Err(Error::new(Span::call_site(), "unknown property"))
+        }
     }
-}
-#[inline] fn camel_cased(snake_case: &Ident) -> Ident {
-    format_ident!("{}", snake_case
-        .to_string()
-        .split('_')
-        .map(|s| {
-            let mut s = s.to_owned();
-            unsafe { s.get_unchecked_mut(0..=0) }
-                .make_ascii_uppercase();
-            s
-        })
-        .collect::<String>()
-    )
 }
 
 impl Build for CSSInput {
     fn build(self) -> TokenStream {
         let properties = self.0.into_iter().fold(TokenStream::new(), |mut token_stream, property| {
             let Property { key, value } = property;
-            let value_str = value.to_string();
 
-            token_stream.extend(
-                if let Some(completion) = completion_for(&key) {
-                    quote!{
-                        #key: #completion #value,
-                    }
-                } else {
-                    quote!{
-                        #key: Some(#value_str),
-                    }
-                }
-            );
+            token_stream.extend(match key {
+                Key::align_items => quote!{
+                    align_items: kabto::css::property::align_items::#value,
+                },
+                Key::display => quote!{
+                    display: kabto::css::property::display::#value,
+                },
+            });
 
             token_stream
         });
