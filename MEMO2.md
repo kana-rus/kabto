@@ -50,9 +50,9 @@ struct App {
                                     span.style("margin-left: 0.25em;")(wa)
                                 )))
                             ),
-                            is_series_article.then(
-                                p(self.description)
-                            ),
+                            p(is_series_article.then(
+                                description
+                            )),
                         )
                     ),
                     Sidebar {},
