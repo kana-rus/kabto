@@ -1,4 +1,5 @@
 mod tag;
+mod html_macro;
 
 use std::{fs::File, io::Write, ops::Sub};
 use crate::{config::Config, Result};
