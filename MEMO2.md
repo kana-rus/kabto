@@ -31,14 +31,14 @@ struct App {
         HTML(
             html.lang("en")(
                 head.prefix("og: http://ogp.me/ns#"),
-                Meta {title: title.clone(), description},
+                Meta {title: meta_title, description: description.clone()},
                 body(
                     header(
                         h1("kanarus")
                     ),
                     div.id("content")(
                         article(
-                            title.map(|t| h2(t)),
+                            h2(title),
                             div.id("metadata")(
                                 div.id("tags")(categories.iter().map(|c|
                                     span.class("tag")(c)
