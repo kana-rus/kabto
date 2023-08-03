@@ -1,14 +1,6 @@
-[workspace]
-members = [
-    ".",
-    "./macros",
-]
-
 [package]
-name = "kabto"
-version = "0.1.0"
-edition = "2021"
+name       = "kabto"
+version    = "0.1.0"
+edition    = "2021"
 
 [dependencies]
-kabto_macros = { version = "0.1.0", path = "./macros" }
-once_cell = "1.17.0"

@@ -1,13 +1,3 @@
-pub mod html;
-pub mod head;
-pub mod title;
-pub mod meta;
-pub mod body;
-pub mod header;
-pub mod h1234;
-pub mod div;
-pub mod article;
-pub mod nav;
-pub mod svg;
-pub mod span;
-pub mod p;
+mod a;
+mod div;
+mod h1;
