@@ -1,3 +1,6 @@
+use super::{AriaRole, Dir};
+
+
 pub struct div {
     id: Option<String>,
     class: Vec<String>,
