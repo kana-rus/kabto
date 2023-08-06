@@ -6,10 +6,32 @@ mod h1;
 
 
 pub enum Dir {
+    auto,
     ltr,
     rtl,
+} impl Dir {
+    pub(crate) fn render(&self) -> &'static str {
+        match self {
+            Self::auto => "\"auto\"",
+            Self::ltr  => "\"ltr\"",
+            Self::rtl  => "\"rtl\"",
+        }
+    }
 }
 
+pub enum Hidden {
+    hidden,
+    until_found,
+} impl Hidden {
+    pub(crate) fn render_to(self, buf: &mut String) {
+        buf.push_str(match self {
+            Self::hidden      => "\"hidden\"",
+            Self::until_found => "\"until-found\"",
+        })
+    }
+}
+
+/*
 pub enum AriaRole {
     /*==== ROLES ====*/
 
@@ -149,3 +171,4 @@ pub enum AriaRole {
     aria_rowspan,
     aria_setsize,
 }
+*/
