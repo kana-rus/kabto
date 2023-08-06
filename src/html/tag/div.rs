@@ -93,6 +93,7 @@ mod test {
                 Cows::Borrowed("<div></div>")
             }
         }
+        #[allow(unused)]
         impl div {
             pub fn class(self, class: impl IntoCows) -> super::super::div {
                 super::super::div::new().class(class)
