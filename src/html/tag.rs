@@ -5,6 +5,7 @@ mod div;
 mod h1;
 
 
+/*
 pub enum Dir {
     auto,
     ltr,
@@ -18,7 +19,9 @@ pub enum Dir {
         }
     }
 }
+*/
 
+/*
 pub enum Hidden {
     hidden,
     until_found,
@@ -30,6 +33,7 @@ pub enum Hidden {
         })
     }
 }
+*/
 
 /*
 pub enum AriaRole {

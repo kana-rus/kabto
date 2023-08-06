@@ -3,7 +3,7 @@ use std::borrow::Cow;
 
 pub(crate) type Cows = Cow<'static, str>;
 
-pub(crate) trait IntoCows: Sized {
+pub trait IntoCows: Sized {
     fn into_cows(self) -> Cows;
     fn render_to(self, buf: &mut String) {
         buf.push('"');
