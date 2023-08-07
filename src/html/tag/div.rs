@@ -3,48 +3,22 @@ use crate::{
     library::{Cows, IntoCows},
     html::{HTML},
 };
+use super::BaseAttributes;
 
 
 pub struct div {
     rendered_child:  Option<Cows>,
-    class:           Option<Cows>,
-    // contenteditable: Option<bool>,
-    // data_attributes: Vec<Cows>,
-    // dir:             Option<Dir>,
-    // draggable:       Option<bool>,
-    // hidden:          Option<Hidden>,
-    id:              Option<Cows>,
-    // role:            Option<AriaRole>,
-    // slot:            Option<Cows>,
-    // spellcheck:      Option<bool>,
-    style:           Option<Cows>,
-    // tabindex:        Option<usize>,
-    // title:           Option<Cows>,
-    // translate:       Option<bool>,
+    base_attributes: BaseAttributes,
 } const _: () = {
     impl HTML for div {
         fn render(self) -> Cows {
-            let mut template = format!("<div");
             let Self {
                 rendered_child,
-
-                class,
-                id,
-                style,
+                base_attributes,
             } = self;
 
-            if let Some(c) = class {
-                template.push_str(" class=");
-                c.render_to(&mut template);
-            }
-            if let Some(id) = id {
-                template.push_str(" id=");
-                id.render_to(&mut template)
-            }
-            if let Some(s) = style {
-                template.push_str(" style=");
-                s.render_to(&mut template)
-            }
+            let mut template = format!("<div");
+            base_attributes.render_to(&mut template);
             template.push_str(">");
 
             if let Some(rendered_child) = rendered_child {
@@ -59,22 +33,20 @@ pub struct div {
     pub(crate) fn new() -> Self {
         Self {
             rendered_child:  None,
-            id:              None,
-            class:           None,
-            style:           None,
+            base_attributes: BaseAttributes::new(),
         }
     }
 } impl div {
     pub fn class(mut self, class: impl IntoCows) -> Self {
-        self.class.replace(class.into_cows());
+        self.base_attributes.class.replace(class.into_cows());
         self
     }
     pub fn id(mut self, id: impl IntoCows) -> Self {
-        self.id.replace(id.into_cows());
+        self.base_attributes.id.replace(id.into_cows());
         self
     }
     pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.style.replace(style.into_cows());
+        self.base_attributes.style.replace(style.into_cows());
         self
     }
 }
