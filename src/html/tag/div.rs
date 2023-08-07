@@ -1,40 +1,23 @@
-// use super::{Dir, Hidden};
+use ::std::marker::Tuple;
+use super::BaseElement;
 use crate::{
     library::{Cows, IntoCows},
     html::{HTML},
 };
-use super::BaseAttributes;
 
 
 pub struct div {
-    rendered_child:  Option<Cows>,
-    base_attributes: BaseAttributes,
-} const _: () = {
-    impl HTML for div {
-        fn render(self) -> Cows {
-            let Self {
-                rendered_child,
-                base_attributes,
-            } = self;
-
-            let mut template = format!("<div");
-            base_attributes.render_to(&mut template);
-            template.push_str(">");
-
-            if let Some(rendered_child) = rendered_child {
-                template.push_str(&rendered_child)
-            }
-            template.push_str("</div>");
-
-            Cows::Owned(template)
-        }
-    }
-}; impl div {
+    rendered_children: Option<Cows>,
+    base_attributes:   BaseElement,
+} impl div {
     pub(crate) fn new() -> Self {
         Self {
-            rendered_child:  None,
-            base_attributes: BaseAttributes::new(),
+            rendered_children: None,
+            base_attributes:   BaseElement::new(),
         }
+    }
+    pub(crate) fn set_children(&mut self, rendered_children: Cows) {
+        self.rendered_children.replace(rendered_children);
     }
 } impl div {
     pub fn class(mut self, class: impl IntoCows) -> Self {
@@ -49,44 +32,101 @@ pub struct div {
         self.base_attributes.style.replace(style.into_cows());
         self
     }
-}
+} const _: () = {
+    impl HTML for div {
+        fn render(self) -> Cows {
+            let Self {
+                rendered_children,
+                base_attributes,
+            } = self;
 
+            let mut template = format!("<div");
+            base_attributes.render_to(&mut template);
+            template.push_str(">");
+
+            if let Some(rendered_children) = rendered_children {
+                template.push_str(&rendered_children)
+            }
+            template.push_str("</div>");
+
+            Cows::Owned(template)
+        }
+    }
+
+    impl<Children: HTML + Tuple> FnOnce<Children> for div {
+        type Output = Cows;
+        extern "rust-call" fn call_once(mut self, children: Children) -> Self::Output {
+            self.set_children(children.render());
+            self.render()
+        }
+    }
+}; 
 
 #[cfg(test)]
 mod test {
-    use crate::{HTML};
+    use std::marker::{Tuple};
+    use crate::{HTML, library::{IntoCows, Cows}};
 
-    mod __ {
-        use crate::{HTML, library::{IntoCows, Cows}};
-
-        pub struct div;
+    struct div;
+    #[allow(unused)]
+    impl div {
+        pub fn class(self, class: impl IntoCows) -> super::div {
+            super::div::new().class(class)
+        }
+        pub fn id(self, id: impl IntoCows) -> super::div {
+            super::div::new().id(id)
+        }
+        pub fn style(self, style: impl IntoCows) -> super::div {
+            super::div::new().style(style)
+        }
+    }
+    const _: () = {
         impl HTML for div {
             fn render(self) -> Cows {
                 Cows::Borrowed("<div></div>")
             }
         }
-        #[allow(unused)]
-        impl div {
-            pub fn class(self, class: impl IntoCows) -> super::super::div {
-                super::super::div::new().class(class)
-            }
-            pub fn id(self, id: impl IntoCows) -> super::super::div {
-                super::super::div::new().id(id)
-            }
-            pub fn style(self, style: impl IntoCows) -> super::super::div {
-                super::super::div::new().style(style)
+        impl<Children: HTML + Tuple> FnOnce<Children> for div {
+            type Output = Cows;
+            extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+                let mut this = super::div::new();
+                this.set_children(children.render());
+                this.render()
             }
         }
-    }
-    #[allow(non_upper_case_globals)]
-    const div: __::div = __::div;
+    };
 
     #[test]
-    fn render_div_tag() {
+    fn render_div() {
+        let div_0 = div;
+        assert_eq!(&div_0.render(), r#"<div></div>"#);
+
         let div_1 = div.id("my-first-html-tag").style("margin: auto;");
         assert_eq!(&div_1.render(), r#"<div id="my-first-html-tag" style="margin: auto;"></div>"#);
 
         let div_2 = div.class("cards-box").id("game-cards-box");
         assert_eq!(&div_2.render(), r#"<div class="cards-box" id="game-cards-box"></div>"#);
+    }
+
+    #[test]
+    fn render_div_with_children() {
+        let div_0 =
+            div.id("main")(
+                div.class("card main-card"),
+                div.class("card").style("margin-top: 8px;"),
+            );
+        assert_eq!(div_0,
+            r#"<div id="main"><div class="card main-card"></div><div class="card" style="margin-top: 8px;"></div></div>"#
+        );
+
+        let div_1 =
+            div.id("main")(
+                div.class("card main-card")(
+                    "This is a card!!!"
+                )
+            );
+        assert_eq!(div_1,
+            r#"<div id="main"><div class="card main-card">This&#32;is&#32;a&#32;card!!!</div></div>"#
+        );
     }
 }

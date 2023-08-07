@@ -10,6 +10,9 @@ pub trait IntoCows: Sized {
         buf.push_str(&self.into_cows());
         buf.push('"')
     }
+    fn escaped(self) -> Cows {
+        escaped(self)
+    }
 } const _: () = {
     impl IntoCows for Cows {
         fn into_cows(self) -> Cows {
@@ -76,3 +79,42 @@ pub(crate) trait Optional<T> {
         }
     }
 };
+
+
+fn escaped(text: impl IntoCows) -> Cows {
+    let text = text.into_cows();
+    for (i, b) in text.bytes().enumerate() {
+        match b {
+            b' ' | b'&' | b'<' | b'>' | b'\'' | b'"' => {
+                let (before, after) = text.as_bytes().split_at(i);
+
+                let len = text.len();
+                let mut bytes = before.to_vec();
+                bytes.reserve_exact(len - i + 16);
+
+                for b in after {
+                    match b {
+                        b' '  => for b in b"&#32;" {bytes.push(*b)}
+                        b'&'  => for b in b"&amp;" {bytes.push(*b)}
+                        b'<'  => for b in b"&lt;"  {bytes.push(*b)}
+                        b'>'  => for b in b"&gt;"  {bytes.push(*b)}
+                        b'\'' => for b in b"&#39;" {bytes.push(*b)}
+                        b'"'  => for b in b"#34;"  {bytes.push(*b)}
+                        _ => bytes.push(*b),
+                    }
+                }
+
+                bytes.shrink_to_fit();
+                return Cow::Owned(unsafe {String::from_utf8_unchecked(bytes)})
+            }
+            _ => ()
+        }
+    }
+    text
+}
+
+#[test]
+fn test_escape() {
+    let case = "Hello, world!";
+    assert_eq!(escaped(case), "Hello,&#32;world!");
+}
