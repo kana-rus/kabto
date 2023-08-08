@@ -1,6 +1,8 @@
 #![allow(non_camel_case_types)]
+mod components;
 
 use crate::library::{Cows, IntoCows};
+use components::*;
 
 
 pub(crate) struct DOM {
@@ -41,14 +43,17 @@ pub(crate) struct BaseElement {
 
 struct a {
     base: BaseElement,
-    href: Option<Cows>,
-    ...
+
+    href:     Option<Cows>,
+    download: Option<Cows>,
+    target:   Option<AnkerTarget>,
+    rel:      Vec<AnkerRel>,
 }
 
 struct div {
-    base: BaseElement
+    base: BaseElement,
 }
 
 struct h1 {
-    base: BaseElement
+    base: BaseElement,
 }
