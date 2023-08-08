@@ -10,13 +10,22 @@ pub(crate) struct DOM {
 }
 
 enum Node {
-    a(a),
-    div(div),
-    h1(h1),
-    text(Cows),
+    Element(Element),
+    Text(Cows),
 }
 
-pub(crate) struct BaseElement {
+enum Element {
+    a { base: BaseElement, children: Children,
+        href:     Option<Cows>,
+        download: Option<Cows>,
+        target:   Option<AnkerTarget>,
+        rel:      Vec<AnkerRel>,
+    },
+    div { base: BaseElement, children: Children },
+    h1  { base: BaseElement, children: Children },
+}
+
+struct BaseElement {
     pub(crate) class: Option<Cows>,
     pub(crate) id:    Option<Cows>,
     pub(crate) style: Option<Cows>,
@@ -41,19 +50,7 @@ pub(crate) struct BaseElement {
     }
 }
 
-struct a {
-    base: BaseElement,
-
-    href:     Option<Cows>,
-    download: Option<Cows>,
-    target:   Option<AnkerTarget>,
-    rel:      Vec<AnkerRel>,
-}
-
-struct div {
-    base: BaseElement,
-}
-
-struct h1 {
-    base: BaseElement,
+enum Children {
+    Elements(Vec<Element>),
+    Text(Cows),
 }
