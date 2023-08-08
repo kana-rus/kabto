@@ -14,15 +14,21 @@ enum Node {
     Text(Cows),
 }
 
-enum Element {
-    a { base: BaseElement, children: Children,
+struct Element {
+    tag:      Tag,
+    base:     BaseElement,
+    children: Option<Children>,
+}
+
+enum Tag {
+    a {
         href:     Option<Cows>,
         download: Option<Cows>,
         target:   Option<AnkerTarget>,
         rel:      Vec<AnkerRel>,
     },
-    div { base: BaseElement, children: Children },
-    h1  { base: BaseElement, children: Children },
+    div,
+    h1,
 }
 
 struct BaseElement {
