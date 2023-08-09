@@ -1,4 +1,4 @@
-pub(crate) enum AnkerTarget {
+pub enum AnkerTarget {
     _blank,
     _self,
     _top,
@@ -14,7 +14,7 @@ pub(crate) enum AnkerTarget {
     }
 }
 
-pub(crate) enum AnkerRel {
+pub enum AnkerRel {
     alternate,
     author,
     bookmark,

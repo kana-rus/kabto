@@ -1,5 +1,3 @@
-#![allow(non_camel_case_types)]
-
 mod components;
 #[cfg(test)] mod test;
 
@@ -7,24 +5,14 @@ use crate::library::{Cows, IntoCows};
 use components::*;
 
 
-pub(crate) struct DOM {
-    root: Node,
-} impl DOM {
-    pub(crate) fn render(self) -> String {
-        let mut buf = String::new();
-        self.root.render_to(&mut buf);
-        buf
-    }
-}
-
-enum Node {
+pub enum Node {
     Element(Element),
     Text(Cows),
 } impl Node {
     pub(crate) fn render_to(self, buf: &mut String) {
         match self {
             Self::Element(e) => e.render_to(buf),
-            Self::Text(text) => buf.push_str(&text.escaped())
+            Self::Text(text) => buf.push_str(&text.html_escaped())
         }
     } 
 }
@@ -34,7 +22,7 @@ enum Node {
 /// ```
 /// みたいなものもあるので、`children` に `Element` と `Text` が
 /// 混ざって並ぶ可能性もある \therefore `children: Vec<Node>`
-struct Element {
+pub struct Element {
     tag:      Tag,
     base:     BaseElement,
     children: Vec<Node>,
@@ -46,20 +34,20 @@ struct Element {
                 buf.push_str("<a");
                 if let Some(h) = href {
                     buf.push_str(" href=");
-                    h.render_to(buf)
+                    h.render_quoted_to(buf)
                 }
                 if let Some(d) = download {
                     buf.push_str(" download=");
-                    d.render_to(buf)
+                    d.render_quoted_to(buf)
                 }
                 if let Some(t) = target {
                     buf.push_str(" target=");
-                    t.as_str().render_to(buf)
+                    t.as_str().render_quoted_to(buf)
                 }
                 if !rel.is_empty() {
                     buf.push_str(" rel=");
                     rel.into_iter().fold(String::new(), |mut s, rel| {
-                        s.push_str(rel.as_str()); s}).render_to(buf)
+                        s.push_str(rel.as_str()); s}).render_quoted_to(buf)
                 }
                 base.render_to(buf);
                 buf.push('>');
@@ -84,7 +72,7 @@ struct Element {
     }
 }
 
-enum Tag {
+pub enum Tag {
     a {
         href:     Option<Cows>,
         download: Option<Cows>,
@@ -95,7 +83,7 @@ enum Tag {
     h1,
 }
 
-struct BaseElement {
+pub struct BaseElement {
     pub(crate) class: Option<Cows>,
     pub(crate) id:    Option<Cows>,
     pub(crate) style: Option<Cows>,
@@ -107,15 +95,28 @@ struct BaseElement {
         let Self { class, id, style } = self;
         if let Some(c) = class {  
             buf.push_str(" class=");
-            c.render_to(buf)
+            c.render_quoted_to(buf)
         }
         if let Some(i) = id {
             buf.push_str(" id=");
-            i.render_to(buf)
+            i.render_quoted_to(buf)
         }
         if let Some(s) = style {
             buf.push_str(" style=");
-            s.render_to(buf)
+            s.render_quoted_to(buf)
         }
+    }
+} impl BaseElement {
+    pub(crate) fn class(mut self, class: impl IntoCows) -> Self {
+        self.class.replace(class.into_cows());
+        self
+    }
+    pub(crate) fn id(mut self, id: impl IntoCows) -> Self {
+        self.id.replace(id.into_cows());
+        self
+    }
+    pub(crate) fn style(mut self, style: impl IntoCows) -> Self {
+        self.style.replace(style.into_cows());
+        self
     }
 }
