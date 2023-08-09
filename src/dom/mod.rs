@@ -14,10 +14,15 @@ enum Node {
     Text(Cows),
 }
 
+/// ```ignore
+/// txtxtxtxtxt<strong>STRONGSTRONGS!!!</strong>xtxtxtxt...
+/// ```
+/// みたいなものもあるので、`children` に `Element` と `Text` が
+/// 混ざって並ぶ可能性もある \therefore `Vec<Node>`
 struct Element {
     tag:      Tag,
     base:     BaseElement,
-    children: Option<Children>,
+    children: Vec<Node>,
 }
 
 enum Tag {
@@ -54,9 +59,4 @@ struct BaseElement {
             s.render_to(buf)
         }
     }
-}
-
-enum Children {
-    Elements(Vec<Element>),
-    Text(Cows),
 }
