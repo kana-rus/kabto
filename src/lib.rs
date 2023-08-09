@@ -10,9 +10,10 @@
 
 
 pub(crate) mod library;
-mod html;
-mod component;
 mod dom;
 
+// mod html;
+// mod component;
 
-pub(crate) use html::{HTML};
+
+// pub(crate) use html::{HTML};
