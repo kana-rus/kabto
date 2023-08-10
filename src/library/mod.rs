@@ -5,6 +5,9 @@ pub(crate) type Cows = Cow<'static, str>;
 
 pub trait IntoCows: Sized {
     fn into_cows(self) -> Cows;
+    fn render_to(self, buf: &mut String) {
+        buf.push_str(&self.into_cows())
+    }
     fn render_quoted_to(self, buf: &mut String) {
         buf.push('"');
         buf.push_str(&self.into_cows());

@@ -1,4 +1,4 @@
-use crate::{library::Cows, dom::tag::{self, BaseElement}};
+use crate::{library::Cows, dom::tag::{self, BaseAttributes}};
 use super::{Node, Element, Tag};
 
 
@@ -11,7 +11,7 @@ fn render(node: Node) -> String {
 #[test] fn render_dom() {
     let dom = render(Node::Element(Element {
         tag: Tag::div(tag::div {
-            __base: BaseElement::new().class("card")
+            __base: BaseAttributes::new().class("card")
         }),
         children: vec![],
     })); assert_eq!(dom,
@@ -20,7 +20,7 @@ fn render(node: Node) -> String {
 
     let dom = render(Node::Element(Element {
         tag: Tag::div(tag::div {
-            __base: BaseElement::new().class("card")
+            __base: BaseAttributes::new().class("card")
         }),
         children: vec![
             Node::Text(Cows::Borrowed("This is card!!!"))
@@ -31,12 +31,12 @@ fn render(node: Node) -> String {
 
     let dom = render(Node::Element(Element {
         tag: Tag::div(tag::div {
-            __base: BaseElement::new().class("card").id("card")
+            __base: BaseAttributes::new().class("card").id("card")
         }),
         children: vec![
             Node::Element(Element {
                 tag: Tag::div(tag::div {
-                    __base: BaseElement::new().class("card-inner")
+                    __base: BaseAttributes::new().class("card-inner")
                 }),
                 children: vec![
                     Node::Text(Cows::Borrowed("This is card!!!"))

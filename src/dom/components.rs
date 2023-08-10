@@ -4,7 +4,7 @@ pub enum AnkerTarget {
     _top,
     _parent,
 } impl AnkerTarget {
-    #[inline] pub(crate) fn as_str(&self) -> &'static str {
+    #[inline] pub(crate) const fn as_str(&self) -> &'static str {
         match self {
             Self::_blank => "_blank",
             Self::_self => "_self",
@@ -30,7 +30,7 @@ pub enum AnkerRel {
     search,
     tag,
 } impl AnkerRel {
-    #[inline] pub(crate) fn as_str(&self) -> &'static str {
+    #[inline] pub(crate) const fn as_str(&self) -> &'static str {
         match self {
             Self::alternate => "alternate",
             Self::author => "author",
