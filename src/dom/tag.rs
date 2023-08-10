@@ -72,10 +72,40 @@ pub struct a {
     pub(crate) href:     Option<Cows>,
     pub(crate) download: Option<Cows>,
     pub(crate) target:   Option<AnkerTarget>,
-    pub(crate) rel:      Vec<AnkerRel>,
+    pub(crate) rel:      Option<AnkerRel>,
+} impl a {
+    pub fn class(mut self, class: impl IntoCows) -> Self {
+        self.__base.class.replace(class.into_cows());
+        self
+    }
+    pub fn id(mut self, id: impl IntoCows) -> Self {
+        self.__base.id.replace(id.into_cows());
+        self
+    }
+    pub fn style(mut self, style: impl IntoCows) -> Self {
+        self.__base.style.replace(style.into_cows());
+        self
+    }
+} impl a {
+    pub fn href(mut self, href: impl IntoCows) -> Self {
+        self.href.replace(href.into_cows());
+        self
+    }
+    pub fn download(mut self, download: impl IntoCows) -> Self {
+        self.download.replace(download.into_cows());
+        self
+    }
+    pub fn target(mut self, target: impl IntoCows) -> Self {
+        self.target.replace(AnkerTarget::from_str(&target.into_cows()));
+        self
+    }
+    pub fn rel(mut self, rel: impl IntoCows) -> Self {
+        self.rel.replace(AnkerRel::from_str(&rel.into_cows()));
+        self
+    }
 } impl a {
     fn render_opening_to(self, buf: &mut String) {
-        let Self { __base, href, download, target, mut rel } = self;
+        let Self { __base, href, download, target, rel } = self;
         "<a".render_to(buf);
         __base.render_to(buf);
 
@@ -91,20 +121,30 @@ pub struct a {
             " target=".render_to(buf);
             t.as_str().render_quoted_to(buf)
         }
-        if !rel.is_empty() {
+        if let Some(r) = rel {
             " rel=".render_to(buf);
-            buf.push('"');
-            rel.pop().unwrap().as_str().render_to(buf);
-            for r in rel {buf.push(' '); r.as_str().render_to(buf)}
-            buf.push('"')
+            r.as_str().render_quoted_to(buf)
         }
 
         buf.push('>')
     }
-}
+} 
 
 pub struct div {
     pub(crate) __base: BaseAttributes,
+} impl div {
+    pub fn class(mut self, class: impl IntoCows) -> Self {
+        self.__base.class.replace(class.into_cows());
+        self
+    }
+    pub fn id(mut self, id: impl IntoCows) -> Self {
+        self.__base.id.replace(id.into_cows());
+        self
+    }
+    pub fn style(mut self, style: impl IntoCows) -> Self {
+        self.__base.style.replace(style.into_cows());
+        self
+    }
 } impl div {
     fn render_opening_to(self, buf: &mut String) {
         let Self { __base } = self;
@@ -116,6 +156,19 @@ pub struct div {
 
 pub struct h1 {
     pub(crate) __base: BaseAttributes,
+} impl h1 {
+    pub fn class(mut self, class: impl IntoCows) -> Self {
+        self.__base.class.replace(class.into_cows());
+        self
+    }
+    pub fn id(mut self, id: impl IntoCows) -> Self {
+        self.__base.id.replace(id.into_cows());
+        self
+    }
+    pub fn style(mut self, style: impl IntoCows) -> Self {
+        self.__base.style.replace(style.into_cows());
+        self
+    }
 } impl h1 {
     fn render_opening_to(self, buf: &mut String) {
         let Self { __base } = self;
