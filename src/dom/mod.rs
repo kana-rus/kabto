@@ -2,8 +2,8 @@ mod components;
 mod tag;
 #[cfg(test)] mod test;
 
-use tag::{Tag};
 use crate::library::{Cows, IntoCows};
+pub(crate) use tag::{Tag, a, div, h1};
 
 
 pub enum Node {

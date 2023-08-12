@@ -104,6 +104,15 @@ pub struct a {
         self
     }
 } impl a {
+    pub(crate) fn new() -> Self {
+        Self {
+            __base:   BaseAttributes::new(),
+            href:     None,
+            download: None,
+            target:   None,
+            rel:      None,
+        }
+    }
     fn render_opening_to(self, buf: &mut String) {
         let Self { __base, href, download, target, rel } = self;
         "<a".render_to(buf);
@@ -146,6 +155,9 @@ pub struct div {
         self
     }
 } impl div {
+    pub(crate) fn new() -> Self {
+        Self { __base: BaseAttributes::new() }
+    }
     fn render_opening_to(self, buf: &mut String) {
         let Self { __base } = self;
         "<div".render_to(buf);
@@ -170,6 +182,9 @@ pub struct h1 {
         self
     }
 } impl h1 {
+    pub(crate) fn new() -> Self {
+        Self { __base: BaseAttributes::new() }
+    }
     fn render_opening_to(self, buf: &mut String) {
         let Self { __base } = self;
         "<h1".render_to(buf);
