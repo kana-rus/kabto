@@ -1,5 +1,5 @@
-use crate::library::{Cows, IntoCows};
-use super::{components::{AnkerTarget, AnkerRel}, Node};
+use crate::{library::{Cows, IntoCows}, component::Children};
+use super::{components::{AnkerTarget, AnkerRel}, Node, Element};
 
 
 pub enum Tag {
@@ -137,7 +137,15 @@ pub struct a {
 
         buf.push('>')
     }
-} 
+} impl<C: Children> FnOnce<C> for a {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::a(self),
+            children: children.collect(),
+        })
+    }
+}
 
 pub struct div {
     pub(crate) __base: BaseAttributes,
@@ -163,6 +171,14 @@ pub struct div {
         "<div".render_to(buf);
         __base.render_to(buf);
         buf.push('>')
+    }
+} impl<C: Children> FnOnce<C> for div {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::div(self),
+            children: children.collect(),
+        })
     }
 }
 
@@ -190,5 +206,13 @@ pub struct h1 {
         "<h1".render_to(buf);
         __base.render_to(buf);
         buf.push('>')
+    }
+} impl<C: Children> FnOnce<C> for h1 {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::h1(self),
+            children: children.collect(),
+        })
     }
 }

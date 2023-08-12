@@ -1,14 +1,13 @@
-use crate::{dom, library::IntoCows};
-use super::IntoNode;
+use crate::{dom::{self, Node, Element, Tag}, library::IntoCows};
+use super::{IntoNode, Children};
 
 
 pub struct a;
 impl IntoNode for a {
-    fn into_node(self) -> dom::Node {
+    fn into_node(self) -> Node {
         dom::a::new().into_node()
     }
-}
-impl a {
+} impl a {
     pub fn class(self, class: impl IntoCows) -> dom::a {
         dom::a::new()
             .class(class)
@@ -21,8 +20,7 @@ impl a {
         dom::a::new()
             .style(style)
     }
-}
-impl a {
+} impl a {
     pub fn href(self, href: impl IntoCows) -> dom::a {
         dom::a::new()
             .href(href)
@@ -39,15 +37,22 @@ impl a {
         dom::a::new()
             .rel(rel)
     }
+} impl<C: Children> FnOnce<C> for a {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::a(dom::a::new()),
+            children: children.collect(),
+        })
+    }
 }
 
 pub struct div;
 impl IntoNode for div {
-    fn into_node(self) -> dom::Node {
+    fn into_node(self) -> Node {
         dom::div::new().into_node()
     }
-}
-impl div {
+} impl div {
     pub fn class(self, class: impl IntoCows) -> dom::div {
         dom::div::new()
             .class(class)
@@ -60,15 +65,22 @@ impl div {
         dom::div::new()
             .style(style)
     }
+} impl<C: Children> FnOnce<C> for div {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::div(dom::div::new()),
+            children: children.collect(),
+        })
+    }
 }
 
 pub struct h1;
 impl IntoNode for h1 {
-    fn into_node(self) -> dom::Node {
+    fn into_node(self) -> Node {
         dom::h1::new().into_node()
     }
-}
-impl h1 {
+} impl h1 {
     pub fn class(self, class: impl IntoCows) -> dom::h1 {
         dom::h1::new()
             .class(class)
@@ -80,5 +92,13 @@ impl h1 {
     pub fn style(self, style: impl IntoCows) -> dom::h1 {
         dom::h1::new()
             .style(style)
+    }
+} impl<C: Children> FnOnce<C> for h1 {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::h1(dom::h1::new()),
+            children: children.collect(),
+        })
     }
 }
