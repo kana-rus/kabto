@@ -17,7 +17,7 @@ struct UserInfo {
                     "age: ", age
                 ),
                 div(
-                    "homepage: ", a(homepage_url),
+                    "homepage: ", a.href(homepage_url.clone())(homepage_url),
                 )
             )
         )
