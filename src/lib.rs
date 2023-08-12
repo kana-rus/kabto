@@ -18,4 +18,4 @@ mod dom;
 mod component;
 
 
-pub use component::{tag::*, Component};
+pub use component::{tag::*, Component, HTML};
