@@ -1,4 +1,4 @@
-use crate::{library::{Cows, IntoCows}, component::Children};
+use crate::{library::{Cows, IntoCows}, component::{NodeCollection}};
 use super::{components::{AnkerTarget, AnkerRel}, Node, Element};
 
 
@@ -51,7 +51,7 @@ pub(crate) struct BaseAttributes {
             s.render_quoted_to(buf)
         }
     }
-} impl BaseAttributes {
+} #[allow(unused)] impl BaseAttributes {
     pub(crate) fn class(mut self, class: impl IntoCows) -> Self {
         self.class.replace(class.into_cows());
         self
@@ -137,9 +137,9 @@ pub struct a {
 
         buf.push('>')
     }
-} impl<C: Children> FnOnce<C> for a {
+} impl<Children: NodeCollection> FnOnce<Children> for a {
     type Output = Node;
-    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
         Node::Element(Element {
             tag: Tag::a(self),
             children: children.collect(),
@@ -172,9 +172,9 @@ pub struct div {
         __base.render_to(buf);
         buf.push('>')
     }
-} impl<C: Children> FnOnce<C> for div {
+} impl<Children: NodeCollection> FnOnce<Children> for div {
     type Output = Node;
-    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
         Node::Element(Element {
             tag: Tag::div(self),
             children: children.collect(),
@@ -207,9 +207,9 @@ pub struct h1 {
         __base.render_to(buf);
         buf.push('>')
     }
-} impl<C: Children> FnOnce<C> for h1 {
+} impl<Children: NodeCollection> FnOnce<Children> for h1 {
     type Output = Node;
-    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
         Node::Element(Element {
             tag: Tag::h1(self),
             children: children.collect(),

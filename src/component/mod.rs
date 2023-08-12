@@ -1,20 +1,87 @@
-mod tag;
+pub(crate) mod tag;
 
 use std::marker::Tuple;
-
 use crate::{
     library::{IntoCows},
-    dom::{Node, Element, a, Tag, div, h1},
+    dom::{self, Node, Element, Tag},
 };
 
 
+pub trait Component {
+    fn render(self) -> impl HTML;
+}
+
 pub trait HTML {
     fn render_to(self, buf: &mut String);
-}
+} const _: () = {
+    impl<NC: NodeCollection> HTML for NC {
+        fn render_to(self, buf: &mut String) {
+            for node in self.collect() {
+                node.render_to(buf)
+            }
+        }
+    }
+};const _: () = {
+    impl HTML for &str {
+        fn render_to(self, buf: &mut String) {
+            buf.push_str(self)
+        }
+    }
+    impl HTML for String {
+        fn render_to(self, buf: &mut String) {
+            buf.push_str(&self)
+        }
+    }
+
+    impl HTML for Node {
+        fn render_to(self, buf: &mut String) {
+            self.render_to(buf)
+        }
+    }
+};const _: () = {
+    impl HTML for crate::a {
+        fn render_to(self, buf: &mut String) {
+            self.into_node().render_to(buf)
+        }
+    }
+    impl HTML for crate::div {
+        fn render_to(self, buf: &mut String) {
+            self.into_node().render_to(buf)
+        }
+    }
+    impl HTML for crate::h1 {
+        fn render_to(self, buf: &mut String) {
+            self.into_node().render_to(buf)
+        }
+    }
+
+    impl HTML for crate::dom::a {
+        fn render_to(self, buf: &mut String) {
+            self.into_node().render_to(buf)
+        }
+    }
+    impl HTML for crate::dom::div {
+        fn render_to(self, buf: &mut String) {
+            self.into_node().render_to(buf)
+        }
+    }
+    impl HTML for crate::dom::h1 {
+        fn render_to(self, buf: &mut String) {
+            self.into_node().render_to(buf)
+        }
+    }
+};
+
 
 pub trait IntoNode {
     fn into_node(self) -> Node;
 } const _: () = {
+    impl IntoNode for Node {
+        fn into_node(self) -> Node {
+            self
+        }
+    }
+
     impl IntoNode for Element {
         fn into_node(self) -> Node {
             Node::Element(self)
@@ -27,7 +94,7 @@ pub trait IntoNode {
         }
     }
 };const _: () = {
-    impl IntoNode for a {
+    impl IntoNode for dom::a {
         fn into_node(self) -> Node {
             Node::Element(Element {
                 tag: Tag::a(self),
@@ -35,7 +102,7 @@ pub trait IntoNode {
             })
         }
     }
-    impl IntoNode for div {
+    impl IntoNode for dom::div {
         fn into_node(self) -> Node {
             Node::Element(Element {
                 tag: Tag::div(self),
@@ -43,7 +110,7 @@ pub trait IntoNode {
             })
         }
     }
-    impl IntoNode for h1 {
+    impl IntoNode for dom::h1 {
         fn into_node(self) -> Node {
             Node::Element(Element {
                 tag: Tag::h1(self),
@@ -53,12 +120,13 @@ pub trait IntoNode {
     }
 };
 
-pub trait Children: Tuple {
+
+pub trait NodeCollection: Tuple {
     fn collect(self) -> Vec<Node>;
 } macro_rules! impl_children {
     ( $( $name:ident ),* ) => {
         #[allow(non_snake_case)]
-        impl<$( $name:IntoNode ),*> Children for ( $( $name,)* ) {
+        impl<$( $name:IntoNode ),*> NodeCollection for ( $( $name,)* ) {
             fn collect(self) -> Vec<Node> {
                 let ( $( $name, )* ) = self;
                 vec![ $( $name.into_node(), )* ]

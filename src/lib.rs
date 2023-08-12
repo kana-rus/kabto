@@ -17,8 +17,5 @@ pub(crate) mod library;
 mod dom;
 mod component;
 
-// mod html;
-// mod component;
 
-
-// pub(crate) use html::{HTML};
+pub use component::{tag::*, Component};

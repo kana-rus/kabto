@@ -1,5 +1,5 @@
 use crate::{dom::{self, Node, Element, Tag}, library::IntoCows};
-use super::{IntoNode, Children};
+use super::{IntoNode, NodeCollection};
 
 
 pub struct a;
@@ -37,9 +37,9 @@ impl IntoNode for a {
         dom::a::new()
             .rel(rel)
     }
-} impl<C: Children> FnOnce<C> for a {
+} impl<Children: NodeCollection> FnOnce<Children> for a {
     type Output = Node;
-    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
         Node::Element(Element {
             tag: Tag::a(dom::a::new()),
             children: children.collect(),
@@ -65,9 +65,9 @@ impl IntoNode for div {
         dom::div::new()
             .style(style)
     }
-} impl<C: Children> FnOnce<C> for div {
+} impl<Children: NodeCollection> FnOnce<Children> for div {
     type Output = Node;
-    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
         Node::Element(Element {
             tag: Tag::div(dom::div::new()),
             children: children.collect(),
@@ -93,9 +93,9 @@ impl IntoNode for h1 {
         dom::h1::new()
             .style(style)
     }
-} impl<C: Children> FnOnce<C> for h1 {
+} impl<Children: NodeCollection> FnOnce<Children> for h1 {
     type Output = Node;
-    extern "rust-call" fn call_once(self, children: C) -> Self::Output {
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
         Node::Element(Element {
             tag: Tag::h1(dom::h1::new()),
             children: children.collect(),
