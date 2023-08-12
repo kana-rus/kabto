@@ -8,7 +8,7 @@ struct UserInfo {
     fn render(self) -> impl HTML {
         let Self { name, age, homepage_url } = self;
 
-        div.class("user-info-box")(
+        div.id("user-info-box").class("info-box")(
             h1.class("user-name-display")(
                 name
             ),
