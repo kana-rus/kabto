@@ -18,5 +18,4 @@ mod dom;
 mod component;
 
 
-pub use component::{Component, HTML};
-pub mod tag {pub use crate::component::tag::*;}
+pub use component::{tag, Component, HTML};

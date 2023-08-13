@@ -1,5 +1,5 @@
 #[cfg(test)] mod _test;
-pub(crate) mod tag;
+pub mod tag;
 
 use crate::{
     library::{IntoCows},
