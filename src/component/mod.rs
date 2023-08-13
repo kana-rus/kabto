@@ -40,17 +40,17 @@ pub trait HTML {
         }
     }
 };const _: () = {
-    impl HTML for crate::a {
+    impl HTML for crate::tag::a {
         fn render_to(self, buf: &mut String) {
             self.into_node().render_to(buf)
         }
     }
-    impl HTML for crate::div {
+    impl HTML for crate::tag::div {
         fn render_to(self, buf: &mut String) {
             self.into_node().render_to(buf)
         }
     }
-    impl HTML for crate::h1 {
+    impl HTML for crate::tag::h1 {
         fn render_to(self, buf: &mut String) {
             self.into_node().render_to(buf)
         }

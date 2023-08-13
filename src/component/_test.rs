@@ -1,5 +1,5 @@
 use std::format as f;
-use crate::{Component, HTML, a, div, h1};
+use crate::{Component, HTML, tag::*};
 
 macro_rules! assert_component {
     ($component:expr, $expected:literal) => {
