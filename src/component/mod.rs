@@ -103,4 +103,10 @@ pub trait NodeCollection {
     impl_children!(IN1, IN2, IN3, IN4, IN5, IN6, IN7, IN8, IN9, IN10, IN11, IN12, IN13, IN14);
     impl_children!(IN1, IN2, IN3, IN4, IN5, IN6, IN7, IN8, IN9, IN10, IN11, IN12, IN13, IN14, IN15);
     impl_children!(IN1, IN2, IN3, IN4, IN5, IN6, IN7, IN8, IN9, IN10, IN11, IN12, IN13, IN14, IN15, IN16);
+}; const _: () = {
+    impl NodeCollection for (Vec<Node>,) {
+        fn collect(self) -> Vec<Node> {
+            self.0
+        }
+    }
 };
