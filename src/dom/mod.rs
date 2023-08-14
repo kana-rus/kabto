@@ -1,7 +1,9 @@
 mod components;
+mod base;
 mod tag;
 #[cfg(test)] mod _test;
 
+pub(crate) use base::BaseAttributes;
 pub(crate) use tag::*;
 use crate::library::{Cows, IntoCows};
 

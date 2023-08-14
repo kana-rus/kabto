@@ -4,15 +4,15 @@ use crate::{Component, HTML, tag::*};
 macro_rules! assert_component {
     ($component:expr, $expected:literal) => {
         {
-            let mut html = String::with_capacity($expected.len());
-            $component.render().render_to(&mut html);
+            let mut rendered_html = String::with_capacity($expected.len());
+            $component.render().render_to(&mut rendered_html);
 
             let mut expected_html = String::with_capacity($expected.len());
             for line in $expected.lines() {
                 expected_html.push_str(line.trim())
             }
         
-            assert_eq!(html, expected_html)
+            assert_eq!(rendered_html, expected_html)
         }
     };
 }
