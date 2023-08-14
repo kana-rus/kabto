@@ -6,6 +6,7 @@ use super::{components::{AnkerTarget, AnkerRel}, Node, Element, BaseAttributes};
 pub(crate) enum Tag {
     html(html),
     head(head),
+    link(link),
     style(style),
     body(body),
 
@@ -31,6 +32,10 @@ pub(crate) enum Tag {
                 head.render_opening_to(buf);
                 for c in children {c.render_to(buf)}
                 "</head>".render_to(buf)
+            }
+            Self::link(link) => {
+                link.render_opening_to(buf);
+                " />".render_to(buf)
             }
             Self::style(style) => {
                 style.render_opening_to(buf);
@@ -158,6 +163,96 @@ impl IntoNode for head {
         })
     }
 }
+
+pub struct link {
+    as_:         Option<Cows>,
+    corsorigin:  Option<Cows>,
+    href:        Option<Cows>,
+    hreflang:    Option<Cows>,
+    imagesizes:  Option<Cows>,
+    imagesrcset: Option<Cows>,
+    media:       Option<Cows>,
+    rel:         Option<Cows>,
+    title:       Option<Cows>,
+    type_:       Option<Cows>,
+} impl link {
+    pub fn as_(mut self, as_: impl IntoCows) -> Self {
+        self.as_.replace(as_.into_cows()); self
+    }
+    pub fn corsorigin(mut self, corsorigin: impl IntoCows) -> Self {
+        self.corsorigin.replace(corsorigin.into_cows()); self
+    }
+    pub fn href(mut self, href: impl IntoCows) -> Self {
+        self.href.replace(href.into_cows()); self
+    }
+    pub fn hreflang(mut self, hreflang: impl IntoCows) -> Self {
+        self.hreflang.replace(hreflang.into_cows()); self
+    }
+    pub fn imagesizes(mut self, imagesizes: impl IntoCows) -> Self {
+        self.imagesizes.replace(imagesizes.into_cows()); self
+    }
+    pub fn imagesrcset(mut self, imagesrcset: impl IntoCows) -> Self {
+        self.imagesrcset.replace(imagesrcset.into_cows()); self
+    }
+    pub fn media(mut self, media: impl IntoCows) -> Self {
+        self.media.replace(media.into_cows()); self
+    }
+    pub fn rel(mut self, rel: impl IntoCows) -> Self {
+        self.rel.replace(rel.into_cows()); self
+    }
+    pub fn title(mut self, title: impl IntoCows) -> Self {
+        self.title.replace(title.into_cows()); self
+    }
+    pub fn type_(mut self, type_: impl IntoCows) -> Self {
+        self.type_.replace(type_.into_cows()); self
+    }
+} impl link {
+    pub(crate) fn new() -> Self {
+        Self { as_: None, corsorigin: None, href: None, hreflang: None, imagesizes: None, imagesrcset: None, media: None, rel: None, title: None, type_: None }
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        let Self { as_, corsorigin, href, hreflang, imagesizes, imagesrcset, media, rel, title, type_ } = self;
+        "<link".render_to(buf);
+
+        if let Some(as_) = as_ {
+            " as=".render_to(buf); as_.render_quoted_to(buf)
+        }
+        if let Some(corsorigin) = corsorigin {
+            " corsorigin=".render_to(buf); corsorigin.render_quoted_to(buf)
+        }
+        if let Some(href) = href {
+            " href=".render_to(buf); href.render_quoted_to(buf)
+        }
+        if let Some(hreflang) = hreflang {
+            " hreflang=".render_to(buf); hreflang.render_quoted_to(buf)
+        }
+        if let Some(imagesizes) = imagesizes {
+            " imagesizes=".render_to(buf); imagesizes.render_quoted_to(buf)
+        }
+        if let Some(imagesrcset) = imagesrcset {
+            " imagesrcset=".render_to(buf); imagesrcset.render_quoted_to(buf)
+        }
+        if let Some(media) = media {
+            " media=".render_to(buf); media.render_quoted_to(buf)
+        }
+        if let Some(rel) = rel {
+            " rel=".render_to(buf); rel.render_quoted_to(buf)
+        }
+        if let Some(title) = title {
+            " title=".render_to(buf); title.render_quoted_to(buf)
+        }
+        if let Some(type_) = type_ {
+            " type=".render_to(buf); type_.render_quoted_to(buf)
+        }
+    }
+} impl IntoNode for link {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag:      Tag::link(self),
+            children: vec![],
+        })
+    }
+} // `link` DOESN'T implement `FnOnce<Children>`
 
 pub struct style {
     media: Option<Cows>,

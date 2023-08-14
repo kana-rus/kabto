@@ -37,6 +37,45 @@ impl IntoNode for head {
     }
 }
 
+pub struct link;
+impl IntoNode for link {
+    fn into_node(self) -> Node {
+        dom::link::new().into_node()
+    }
+} // `link` DOESN'T implement `FnOnce<Children>`
+impl link {
+    pub fn as_(self, as_: impl IntoCows) -> dom::link {
+        dom::link::new().as_(as_)
+    }
+    pub fn corsorigin(self, corsorigin: impl IntoCows) -> dom::link {
+        dom::link::new().corsorigin(corsorigin)
+    }
+    pub fn href(self, href: impl IntoCows) -> dom::link {
+        dom::link::new().href(href)
+    }
+    pub fn hreflang(self, hreflang: impl IntoCows) -> dom::link {
+        dom::link::new().hreflang(hreflang)
+    }
+    pub fn imagesizes(self, imagesizes: impl IntoCows) -> dom::link {
+        dom::link::new().imagesizes(imagesizes)
+    }
+    pub fn imagesrcset(self, imagesrcset: impl IntoCows) -> dom::link {
+        dom::link::new().imagesrcset(imagesrcset)
+    }
+    pub fn media(self, media: impl IntoCows) -> dom::link {
+        dom::link::new().media(media)
+    }
+    pub fn rel(self, rel: impl IntoCows) -> dom::link {
+        dom::link::new().rel(rel)
+    }
+    pub fn title(self, title: impl IntoCows) -> dom::link {
+        dom::link::new().title(title)
+    }
+    pub fn type_(self, type_: impl IntoCows) -> dom::link {
+        dom::link::new().type_(type_)
+    }
+}
+
 pub struct style;
 impl style {
     pub fn media(self, media: impl IntoCows) -> dom::style {
