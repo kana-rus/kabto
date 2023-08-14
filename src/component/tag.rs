@@ -22,6 +22,21 @@ impl html {
     }
 }
 
+pub struct head;
+impl IntoNode for head {
+    fn into_node(self) -> Node {
+        dom::head::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for head {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::head(dom::head::new()),
+            children: children.collect(),
+        })
+    }
+}
+
 
 pub struct a;
 impl IntoNode for a {

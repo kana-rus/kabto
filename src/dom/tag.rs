@@ -5,13 +5,14 @@ use super::{components::{AnkerTarget, AnkerRel}, Node, Element, BaseAttributes};
 
 pub(crate) enum Tag {
     html(html),
+    head(head),
+    body(body),
 
     a(a),
     p(p),
     span(span),
 
     div(div),
-    body(body),
     header(header),
     h1(h1),
     h2(h2),
@@ -24,6 +25,11 @@ pub(crate) enum Tag {
                 html.render_opening_to(buf);
                 for c in children {c.render_to(buf)}
                 "</html>".render_to(buf)
+            }
+            Self::head(head) => {
+                head.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</head>".render_to(buf)
             }
 
             Self::a(a) => {
@@ -117,6 +123,24 @@ pub struct html {
         Node::Element(Element {
             tag: Tag::html(self),
             children: children.collect(),
+        })
+    }
+}
+
+pub struct head {}
+impl head {
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        "<head>".render_to(buf)
+    }
+}
+impl IntoNode for head {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::head(self),
+            children: vec![],
         })
     }
 }
