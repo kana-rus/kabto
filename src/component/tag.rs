@@ -1,15 +1,145 @@
 use std::marker::Tuple;
-
 use crate::{dom::{self, Node, Element, Tag}, library::IntoCows};
 use super::{IntoNode, NodeCollection};
 
 
-pub struct a;
-impl IntoNode for a {
-    fn into_node(self) -> Node {
-        dom::a::new().into_node()
+pub struct html;
+impl html {
+    pub fn lang(self, lang: impl IntoCows) -> dom::html {
+        dom::html::new().lang(lang)
     }
-} impl a {
+} impl IntoNode for html {
+    fn into_node(self) -> Node {
+        dom::html::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for html {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::html(dom::html::new()),
+            children: children.collect(),
+        })
+    }
+}
+
+pub struct head;
+impl IntoNode for head {
+    fn into_node(self) -> Node {
+        dom::head::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for head {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::head(dom::head::new()),
+            children: children.collect(),
+        })
+    }
+}
+
+pub struct link;
+impl IntoNode for link {
+    fn into_node(self) -> Node {
+        dom::link::new().into_node()
+    }
+} // `link` DOESN'T implement `FnOnce<Children>`
+impl link {
+    pub fn as_(self, as_: impl IntoCows) -> dom::link {
+        dom::link::new().as_(as_)
+    }
+    pub fn corsorigin(self, corsorigin: impl IntoCows) -> dom::link {
+        dom::link::new().corsorigin(corsorigin)
+    }
+    pub fn href(self, href: impl IntoCows) -> dom::link {
+        dom::link::new().href(href)
+    }
+    pub fn hreflang(self, hreflang: impl IntoCows) -> dom::link {
+        dom::link::new().hreflang(hreflang)
+    }
+    pub fn imagesizes(self, imagesizes: impl IntoCows) -> dom::link {
+        dom::link::new().imagesizes(imagesizes)
+    }
+    pub fn imagesrcset(self, imagesrcset: impl IntoCows) -> dom::link {
+        dom::link::new().imagesrcset(imagesrcset)
+    }
+    pub fn media(self, media: impl IntoCows) -> dom::link {
+        dom::link::new().media(media)
+    }
+    pub fn rel(self, rel: impl IntoCows) -> dom::link {
+        dom::link::new().rel(rel)
+    }
+    pub fn title(self, alternative_stylesheet: impl IntoCows) -> dom::link {
+        dom::link::new().title(alternative_stylesheet)
+    }
+    pub fn type_(self, type_: impl IntoCows) -> dom::link {
+        dom::link::new().type_(type_)
+    }
+}
+
+pub struct meta;
+impl IntoNode for meta {
+    fn into_node(self) -> Node {
+        dom::meta::new().into_node()
+    }
+} // `meta` DOESN'T implement `FnOnce<Children>`
+impl meta {
+    pub fn charset(self, charset: impl IntoCows) -> dom::meta {
+        dom::meta::new().charset(charset)
+    }
+    pub fn content(self, content: impl IntoCows) -> dom::meta {
+        dom::meta::new().content(content)
+    }
+    pub fn http_equiv(self, http_equiv: impl IntoCows) -> dom::meta {
+        dom::meta::new().http_equiv(http_equiv)
+    }
+    pub fn name(self, name: impl IntoCows) -> dom::meta {
+        dom::meta::new().name(name)
+    }
+}
+
+pub struct title;
+impl IntoNode for title {
+    fn into_node(self) -> Node {
+        dom::title::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for title {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::title(dom::title::new()),
+            children: children.collect(),
+        })
+    }
+}
+
+pub struct style;
+impl style {
+    pub fn media(self, media: impl IntoCows) -> dom::style {
+        dom::style::new().media(media)
+    }
+    pub fn nonce(self, nonce: impl IntoCows) -> dom::style {
+        dom::style::new().nonce(nonce)
+    }
+    pub fn title(self, altanative_stylesheet: impl IntoCows) -> dom::style {
+        dom::style::new().title(altanative_stylesheet)
+    }
+} impl IntoNode for style {
+    fn into_node(self) -> Node {
+        dom::style::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for style {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::style(dom::style::new()),
+            children: children.collect(),
+        })
+    }
+}
+
+
+pub struct a;
+impl a {
     pub fn class(self, class: impl IntoCows) -> dom::a {
         dom::a::new()
             .class(class)
@@ -18,9 +148,9 @@ impl IntoNode for a {
         dom::a::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::a {
+    pub fn style(self, css: impl IntoCows) -> dom::a {
         dom::a::new()
-            .style(style)
+            .style(css)
     }
 } impl a {
     pub fn href(self, href: impl IntoCows) -> dom::a {
@@ -39,6 +169,10 @@ impl IntoNode for a {
         dom::a::new()
             .rel(rel)
     }
+} impl IntoNode for a {
+    fn into_node(self) -> Node {
+        dom::a::new().into_node()
+    }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for a {
     type Output = Node;
     extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
@@ -50,11 +184,7 @@ impl IntoNode for a {
 }
 
 pub struct p;
-impl IntoNode for p {
-    fn into_node(self) -> Node {
-        dom::p::new().into_node()
-    }
-} impl p {
+impl p {
     pub fn class(self, class: impl IntoCows) -> dom::p {
         dom::p::new()
             .class(class)
@@ -63,9 +193,13 @@ impl IntoNode for p {
         dom::p::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::p {
+    pub fn style(self, css: impl IntoCows) -> dom::p {
         dom::p::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for p {
+    fn into_node(self) -> Node {
+        dom::p::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for p {
     type Output = Node;
@@ -78,11 +212,7 @@ impl IntoNode for p {
 }
 
 pub struct span;
-impl IntoNode for span {
-    fn into_node(self) -> Node {
-        dom::span::new().into_node()
-    }
-} impl span {
+impl span {
     pub fn class(self, class: impl IntoCows) -> dom::span {
         dom::span::new()
             .class(class)
@@ -91,9 +221,13 @@ impl IntoNode for span {
         dom::span::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::span {
+    pub fn style(self, css: impl IntoCows) -> dom::span {
         dom::span::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for span {
+    fn into_node(self) -> Node {
+        dom::span::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for span {
     type Output = Node;
@@ -107,11 +241,7 @@ impl IntoNode for span {
 
 
 pub struct div;
-impl IntoNode for div {
-    fn into_node(self) -> Node {
-        dom::div::new().into_node()
-    }
-} impl div {
+impl div {
     pub fn class(self, class: impl IntoCows) -> dom::div {
         dom::div::new()
             .class(class)
@@ -120,9 +250,13 @@ impl IntoNode for div {
         dom::div::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::div {
+    pub fn style(self, css: impl IntoCows) -> dom::div {
         dom::div::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for div {
+    fn into_node(self) -> Node {
+        dom::div::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for div {
     type Output = Node;
@@ -135,11 +269,7 @@ impl IntoNode for div {
 }
 
 pub struct body;
-impl IntoNode for body {
-    fn into_node(self) -> Node {
-        dom::body::new().into_node()
-    }
-} impl body {
+impl body {
     pub fn class(self, class: impl IntoCows) -> dom::body {
         dom::body::new()
             .class(class)
@@ -148,9 +278,13 @@ impl IntoNode for body {
         dom::body::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::body {
+    pub fn style(self, css: impl IntoCows) -> dom::body {
         dom::body::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for body {
+    fn into_node(self) -> Node {
+        dom::body::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for body {
     type Output = Node;
@@ -163,11 +297,7 @@ impl IntoNode for body {
 }
 
 pub struct header;
-impl IntoNode for header {
-    fn into_node(self) -> Node {
-        dom::header::new().into_node()
-    }
-} impl header {
+impl header {
     pub fn class(self, class: impl IntoCows) -> dom::header {
         dom::header::new()
             .class(class)
@@ -176,9 +306,13 @@ impl IntoNode for header {
         dom::header::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::header {
+    pub fn style(self, css: impl IntoCows) -> dom::header {
         dom::header::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for header {
+    fn into_node(self) -> Node {
+        dom::header::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for header {
     type Output = Node;
@@ -191,11 +325,7 @@ impl IntoNode for header {
 }
 
 pub struct h1;
-impl IntoNode for h1 {
-    fn into_node(self) -> Node {
-        dom::h1::new().into_node()
-    }
-} impl h1 {
+impl h1 {
     pub fn class(self, class: impl IntoCows) -> dom::h1 {
         dom::h1::new()
             .class(class)
@@ -204,9 +334,13 @@ impl IntoNode for h1 {
         dom::h1::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::h1 {
+    pub fn style(self, css: impl IntoCows) -> dom::h1 {
         dom::h1::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for h1 {
+    fn into_node(self) -> Node {
+        dom::h1::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h1 {
     type Output = Node;
@@ -219,11 +353,7 @@ impl IntoNode for h1 {
 }
 
 pub struct h2;
-impl IntoNode for h2 {
-    fn into_node(self) -> Node {
-        dom::h2::new().into_node()
-    }
-} impl h2 {
+impl h2 {
     pub fn class(self, class: impl IntoCows) -> dom::h2 {
         dom::h2::new()
             .class(class)
@@ -232,9 +362,13 @@ impl IntoNode for h2 {
         dom::h2::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::h2 {
+    pub fn style(self, css: impl IntoCows) -> dom::h2 {
         dom::h2::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for h2 {
+    fn into_node(self) -> Node {
+        dom::h2::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h2 {
     type Output = Node;
@@ -247,11 +381,7 @@ impl IntoNode for h2 {
 }
 
 pub struct h3;
-impl IntoNode for h3 {
-    fn into_node(self) -> Node {
-        dom::h3::new().into_node()
-    }
-} impl h3 {
+impl h3 {
     pub fn class(self, class: impl IntoCows) -> dom::h3 {
         dom::h3::new()
             .class(class)
@@ -260,9 +390,13 @@ impl IntoNode for h3 {
         dom::h3::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::h3 {
+    pub fn style(self, css: impl IntoCows) -> dom::h3 {
         dom::h3::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for h3 {
+    fn into_node(self) -> Node {
+        dom::h3::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h3 {
     type Output = Node;
@@ -275,11 +409,7 @@ impl IntoNode for h3 {
 }
 
 pub struct h4;
-impl IntoNode for h4 {
-    fn into_node(self) -> Node {
-        dom::h4::new().into_node()
-    }
-} impl h4 {
+impl h4 {
     pub fn class(self, class: impl IntoCows) -> dom::h4 {
         dom::h4::new()
             .class(class)
@@ -288,9 +418,13 @@ impl IntoNode for h4 {
         dom::h4::new()
             .id(id)
     }
-    pub fn style(self, style: impl IntoCows) -> dom::h4 {
+    pub fn style(self, css: impl IntoCows) -> dom::h4 {
         dom::h4::new()
-            .style(style)
+            .style(css)
+    }
+} impl IntoNode for h4 {
+    fn into_node(self) -> Node {
+        dom::h4::new().into_node()
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h4 {
     type Output = Node;

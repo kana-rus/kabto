@@ -72,16 +72,16 @@ pub trait IntoCows: Sized {
     impl IntoCows for usize {
         fn into_cows(self) -> Cows {
             match self {
-                0 => Cow::Borrowed("0"),
-                1 => Cow::Borrowed("1"),
-                2 => Cow::Borrowed("2"),
-                3 => Cow::Borrowed("3"),
-                4 => Cow::Borrowed("4"),
-                5 => Cow::Borrowed("5"),
-                6 => Cow::Borrowed("6"),
-                7 => Cow::Borrowed("7"),
-                8 => Cow::Borrowed("8"),
-                9 => Cow::Borrowed("9"),
+                0  => Cow::Borrowed("0"),  1  => Cow::Borrowed("1"),  2  => Cow::Borrowed("2"),
+                3  => Cow::Borrowed("3"),  4  => Cow::Borrowed("4"),  5  => Cow::Borrowed("5"),
+                6  => Cow::Borrowed("6"),  7  => Cow::Borrowed("7"),  8  => Cow::Borrowed("8"),
+                9  => Cow::Borrowed("9"),  10 => Cow::Borrowed("10"), 11 => Cow::Borrowed("11"),
+                12 => Cow::Borrowed("12"), 13 => Cow::Borrowed("13"), 14 => Cow::Borrowed("14"),
+                15 => Cow::Borrowed("15"), 16 => Cow::Borrowed("16"), 17 => Cow::Borrowed("17"),
+                18 => Cow::Borrowed("18"), 19 => Cow::Borrowed("19"), 20 => Cow::Borrowed("20"),
+                21 => Cow::Borrowed("21"), 22 => Cow::Borrowed("22"), 23 => Cow::Borrowed("23"),
+                24 => Cow::Borrowed("24"), 25 => Cow::Borrowed("25"), 26 => Cow::Borrowed("26"),
+                27 => Cow::Borrowed("27"), 28 => Cow::Borrowed("28"), 29 => Cow::Borrowed("29"),
                 n => Cow::Owned(n.to_string()),
             }
         }

@@ -1,16 +1,22 @@
 use std::marker::Tuple;
-
 use crate::{library::{Cows, IntoCows}, component::{NodeCollection, IntoNode}};
-use super::{components::{AnkerTarget, AnkerRel}, Node, Element};
+use super::{components::{AnkerTarget, AnkerRel}, Node, Element, BaseAttributes};
 
 
 pub(crate) enum Tag {
+    html(html),
+    head(head),
+    link(link),
+    meta(meta),
+    title(title),
+    style(style),
+    body(body),
+
     a(a),
     p(p),
     span(span),
 
     div(div),
-    body(body),
     header(header),
     h1(h1),
     h2(h2),
@@ -19,6 +25,38 @@ pub(crate) enum Tag {
 } impl Tag {
     pub(crate) fn render_with_children(self, children: Vec<Node>, buf: &mut String) {
         match self {
+            Self::html(html) => {
+                html.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</html>".render_to(buf)
+            }
+            Self::head(head) => {
+                head.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</head>".render_to(buf)
+            }
+            Self::link(link) => {
+                link.render_self_closing_to(buf);
+            }
+            Self::meta(meta) => {
+                meta.render_self_closing_to(buf);
+            }
+            Self::title(title) => {
+                title.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</title>".render_to(buf)
+            }
+            Self::style(style) => {
+                style.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</style>".render_to(buf)
+            }
+            Self::body(body) => {
+                body.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</body>".render_to(buf)
+            }
+
             Self::a(a) => {
                 a.render_opening_to(buf);
                 for c in children {c.render_to(buf)}
@@ -39,11 +77,6 @@ pub(crate) enum Tag {
                 div.render_opening_to(buf);
                 for c in children {c.render_to(buf)}
                 "</div>".render_to(buf)
-            }
-            Self::body(body) => {
-                body.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</body>".render_to(buf)
             }
             Self::header(header) => {
                 header.render_opening_to(buf);
@@ -74,41 +107,293 @@ pub(crate) enum Tag {
     }
 }
 
-pub(crate) struct BaseAttributes {
-    pub(crate) class: Option<Cows>,
-    pub(crate) id:    Option<Cows>,
-    pub(crate) style: Option<Cows>,
-} impl BaseAttributes {
+
+pub struct html {
+    lang: Option<Cows>
+} impl html {
+    pub fn lang(mut self, lang: impl IntoCows) -> Self {
+        self.lang.replace(lang.into_cows());
+        self
+    }
+} impl html {
     pub(crate) fn new() -> Self {
-        Self { class: None, id: None, style: None }
+        Self { lang: None }
     }
-    pub(crate) fn render_to(self, buf: &mut String) {
-        let Self { class, id, style } = self;
-        if let Some(c) = class {  
-            " class=".render_to(buf);
-            c.render_quoted_to(buf)
+    fn render_opening_to(self, buf: &mut String) {
+        let Self { lang } = self;
+        "<html".render_to(buf);
+
+        if let Some(lang) = lang {
+            " lang=".render_to(buf);
+            lang.render_quoted_to(buf)
         }
-        if let Some(i) = id {
-            " id=".render_to(buf);
-            i.render_quoted_to(buf)
-        }
-        if let Some(s) = style {
-            " style=".render_to(buf);
-            s.render_quoted_to(buf)
-        }
+
+        buf.push('>')
     }
-} #[allow(unused)] impl BaseAttributes {
-    pub(crate) fn class(mut self, class: impl IntoCows) -> Self {
-        self.class.replace(class.into_cows());
+} impl IntoNode for html {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::html(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for html {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::html(self),
+            children: children.collect(),
+        })
+    }
+}
+
+pub struct head {}
+impl head {
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        "<head>".render_to(buf)
+    }
+}
+impl IntoNode for head {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::head(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for head {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::head(self),
+            children: children.collect(),
+        })
+    }
+}
+
+pub struct link {
+    as_:         Option<Cows>,
+    corsorigin:  Option<Cows>,
+    href:        Option<Cows>,
+    hreflang:    Option<Cows>,
+    imagesizes:  Option<Cows>,
+    imagesrcset: Option<Cows>,
+    media:       Option<Cows>,
+    rel:         Option<Cows>,
+    title:       Option<Cows>,
+    type_:       Option<Cows>,
+} impl link {
+    pub fn as_(mut self, as_: impl IntoCows) -> Self {
+        self.as_.replace(as_.into_cows()); self
+    }
+    pub fn corsorigin(mut self, corsorigin: impl IntoCows) -> Self {
+        self.corsorigin.replace(corsorigin.into_cows()); self
+    }
+    pub fn href(mut self, href: impl IntoCows) -> Self {
+        self.href.replace(href.into_cows()); self
+    }
+    pub fn hreflang(mut self, hreflang: impl IntoCows) -> Self {
+        self.hreflang.replace(hreflang.into_cows()); self
+    }
+    pub fn imagesizes(mut self, imagesizes: impl IntoCows) -> Self {
+        self.imagesizes.replace(imagesizes.into_cows()); self
+    }
+    pub fn imagesrcset(mut self, imagesrcset: impl IntoCows) -> Self {
+        self.imagesrcset.replace(imagesrcset.into_cows()); self
+    }
+    pub fn media(mut self, media: impl IntoCows) -> Self {
+        self.media.replace(media.into_cows()); self
+    }
+    pub fn rel(mut self, rel: impl IntoCows) -> Self {
+        self.rel.replace(rel.into_cows()); self
+    }
+    pub fn title(mut self, title: impl IntoCows) -> Self {
+        self.title.replace(title.into_cows()); self
+    }
+    pub fn type_(mut self, type_: impl IntoCows) -> Self {
+        self.type_.replace(type_.into_cows()); self
+    }
+} impl link {
+    pub(crate) fn new() -> Self {
+        Self { as_: None, corsorigin: None, href: None, hreflang: None, imagesizes: None, imagesrcset: None, media: None, rel: None, title: None, type_: None }
+    }
+    fn render_self_closing_to(self, buf: &mut String) {
+        let Self { as_, corsorigin, href, hreflang, imagesizes, imagesrcset, media, rel, title, type_ } = self;
+        "<link".render_to(buf);
+
+        if let Some(as_) = as_ {
+            " as=".render_to(buf); as_.render_quoted_to(buf)
+        }
+        if let Some(corsorigin) = corsorigin {
+            " corsorigin=".render_to(buf); corsorigin.render_quoted_to(buf)
+        }
+        if let Some(href) = href {
+            " href=".render_to(buf); href.render_quoted_to(buf)
+        }
+        if let Some(hreflang) = hreflang {
+            " hreflang=".render_to(buf); hreflang.render_quoted_to(buf)
+        }
+        if let Some(imagesizes) = imagesizes {
+            " imagesizes=".render_to(buf); imagesizes.render_quoted_to(buf)
+        }
+        if let Some(imagesrcset) = imagesrcset {
+            " imagesrcset=".render_to(buf); imagesrcset.render_quoted_to(buf)
+        }
+        if let Some(media) = media {
+            " media=".render_to(buf); media.render_quoted_to(buf)
+        }
+        if let Some(rel) = rel {
+            " rel=".render_to(buf); rel.render_quoted_to(buf)
+        }
+        if let Some(title) = title {
+            " title=".render_to(buf); title.render_quoted_to(buf)
+        }
+        if let Some(type_) = type_ {
+            " type=".render_to(buf); type_.render_quoted_to(buf)
+        }
+
+        " />".render_to(buf)
+    }
+} impl IntoNode for link {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag:      Tag::link(self),
+            children: vec![],
+        })
+    }
+} // `link` DOESN'T implement `FnOnce<Children>`
+
+pub struct meta {
+    charset:    Option<Cows>,
+    content:    Option<Cows>,
+    http_equiv: Option<Cows>,
+    name:       Option<Cows>,
+} impl meta {
+    pub fn charset(mut self, charset: impl IntoCows) -> Self {
+        self.charset.replace(charset.into_cows()); self
+    }
+    pub fn content(mut self, content: impl IntoCows) -> Self {
+        self.content.replace(content.into_cows()); self
+    }
+    pub fn http_equiv(mut self, http_equiv: impl IntoCows) -> Self {
+        self.http_equiv.replace(http_equiv.into_cows()); self
+    }
+    pub fn name(mut self, name: impl IntoCows) -> Self {
+        self.name.replace(name.into_cows()); self
+    }
+} impl meta {
+    pub(crate) fn new() -> Self {
+        Self { charset: None, content: None, http_equiv: None, name: None }
+    }
+    fn render_self_closing_to(self, buf: &mut String) {
+        let Self { charset, content, http_equiv, name } = self;
+        "<meta".render_to(buf);
+
+        if let Some(charset) = charset {
+            " charset=".render_to(buf); charset.render_quoted_to(buf)
+        }
+        if let Some(content) = content {
+            " content=".render_to(buf); content.render_quoted_to(buf)
+        }
+        if let Some(http_equiv) = http_equiv {
+            " http-equiv=".render_to(buf); http_equiv.render_quoted_to(buf)
+        }
+        if let Some(name) = name {
+            " name=".render_to(buf); name.render_quoted_to(buf)
+        }
+
+        " />".render_to(buf)
+    }
+} impl IntoNode for meta {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag:      Tag::meta(self),
+            children: vec![]
+        })
+    }
+} // `link` DOESN'T implement `FnOnce<Children>`
+
+pub struct title {}
+impl title {
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        "<title>".render_to(buf)
+    }
+} impl IntoNode for title {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::title(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for title {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::title(self),
+            children: children.collect(),
+        })
+    }
+}
+ 
+pub struct style {
+    media: Option<Cows>,
+    nonce: Option<Cows>,
+    title: Option<Cows>,
+} impl style {
+    pub fn media(mut self, media: impl IntoCows) -> Self {
+        self.media.replace(media.into_cows());
         self
     }
-    pub(crate) fn id(mut self, id: impl IntoCows) -> Self {
-        self.id.replace(id.into_cows());
+    pub fn nonce(mut self, nonce: impl IntoCows) -> Self {
+        self.nonce.replace(nonce.into_cows());
         self
     }
-    pub(crate) fn style(mut self, style: impl IntoCows) -> Self {
-        self.style.replace(style.into_cows());
+    pub fn title(mut self, title: impl IntoCows) -> Self {
+        self.title.replace(title.into_cows());
         self
+    }
+} impl style {
+    pub(crate) fn new() -> Self {
+        Self { media: None, nonce: None, title: None }
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        let Self { media, nonce, title } = self;
+        "<style".render_to(buf);
+
+        if let Some(media) = media {
+            " media=".render_to(buf);
+            media.render_quoted_to(buf);
+        }
+        if let Some(nonce) = nonce {
+            " nonce=".render_to(buf);
+            nonce.render_quoted_to(buf);
+        }
+        if let Some(title) = title {
+            " title=".render_to(buf);
+            title.render_quoted_to(buf);
+        }
+
+        buf.push('>')
+    }
+} impl IntoNode for style {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::style(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for style {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::style(self),
+            children: children.collect(),
+        })
     }
 }
 
@@ -128,8 +413,8 @@ pub struct a {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl a {
@@ -211,8 +496,8 @@ pub struct p {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl p {
@@ -253,8 +538,8 @@ pub struct span {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl span {
@@ -297,8 +582,8 @@ pub struct div {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl div {
@@ -339,8 +624,8 @@ pub struct header {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl header {
@@ -381,8 +666,8 @@ pub struct body {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl body {
@@ -423,8 +708,8 @@ pub struct h1 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h1 {
@@ -465,8 +750,8 @@ pub struct h2 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h2 {
@@ -507,8 +792,8 @@ pub struct h3 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h3 {
@@ -549,8 +834,8 @@ pub struct h4 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h4 {
