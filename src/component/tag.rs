@@ -1,7 +1,26 @@
 use std::marker::Tuple;
-
 use crate::{dom::{self, Node, Element, Tag}, library::IntoCows};
 use super::{IntoNode, NodeCollection};
+
+
+pub struct html;
+impl html {
+    pub fn lang(self, lang: impl IntoCows) -> dom::html {
+        dom::html::new().lang(lang)
+    }
+} impl IntoNode for html {
+    fn into_node(self) -> Node {
+        dom::html::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for html {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::html(dom::html::new()),
+            children: children.collect(),
+        })
+    }
+}
 
 
 pub struct a;

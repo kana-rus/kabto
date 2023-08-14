@@ -5,6 +5,8 @@ use super::{components::{AnkerTarget, AnkerRel}, Node, Element};
 
 
 pub(crate) enum Tag {
+    html(html),
+
     a(a),
     p(p),
     span(span),
@@ -19,6 +21,12 @@ pub(crate) enum Tag {
 } impl Tag {
     pub(crate) fn render_with_children(self, children: Vec<Node>, buf: &mut String) {
         match self {
+            Self::html(html) => {
+                html.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</html>".render_to(buf)
+            }
+
             Self::a(a) => {
                 a.render_opening_to(buf);
                 for c in children {c.render_to(buf)}
@@ -109,6 +117,46 @@ pub(crate) struct BaseAttributes {
     pub(crate) fn style(mut self, style: impl IntoCows) -> Self {
         self.style.replace(style.into_cows());
         self
+    }
+}
+
+
+pub struct html {
+    lang: Option<Cows>
+} impl html {
+    pub fn lang(mut self, lang: impl IntoCows) -> Self {
+        self.lang.replace(lang.into_cows());
+        self
+    }
+} impl html {
+    pub(crate) fn new() -> Self {
+        Self { lang: None }
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        let Self { lang } = self;
+        "<html".render_to(buf);
+
+        if let Some(lang) = lang {
+            " lang=".render_to(buf);
+            lang.render_quoted_to(buf)
+        }
+
+        buf.push('>')
+    }
+} impl IntoNode for html {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::html(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for html {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::html(self),
+            children: children.collect(),
+        })
     }
 }
 
