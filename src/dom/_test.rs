@@ -1,4 +1,4 @@
-use crate::{library::Cows, dom::tag::{self, BaseAttributes}};
+use crate::{library::Cows, dom::{tag, BaseAttributes}};
 use super::{Node, Element, Tag};
 
 
