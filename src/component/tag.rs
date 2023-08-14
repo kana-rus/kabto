@@ -68,8 +68,8 @@ impl link {
     pub fn rel(self, rel: impl IntoCows) -> dom::link {
         dom::link::new().rel(rel)
     }
-    pub fn title(self, title: impl IntoCows) -> dom::link {
-        dom::link::new().title(title)
+    pub fn title(self, alternative_stylesheet: impl IntoCows) -> dom::link {
+        dom::link::new().title(alternative_stylesheet)
     }
     pub fn type_(self, type_: impl IntoCows) -> dom::link {
         dom::link::new().type_(type_)
@@ -97,6 +97,21 @@ impl meta {
     }
 }
 
+pub struct title;
+impl IntoNode for title {
+    fn into_node(self) -> Node {
+        dom::title::new().into_node()
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for title {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::title(dom::title::new()),
+            children: children.collect(),
+        })
+    }
+}
+
 pub struct style;
 impl style {
     pub fn media(self, media: impl IntoCows) -> dom::style {
@@ -105,8 +120,8 @@ impl style {
     pub fn nonce(self, nonce: impl IntoCows) -> dom::style {
         dom::style::new().nonce(nonce)
     }
-    pub fn title(self, title: impl IntoCows) -> dom::style {
-        dom::style::new().title(title)
+    pub fn title(self, altanative_stylesheet: impl IntoCows) -> dom::style {
+        dom::style::new().title(altanative_stylesheet)
     }
 } impl IntoNode for style {
     fn into_node(self) -> Node {

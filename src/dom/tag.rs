@@ -8,6 +8,7 @@ pub(crate) enum Tag {
     head(head),
     link(link),
     meta(meta),
+    title(title),
     style(style),
     body(body),
 
@@ -39,6 +40,11 @@ pub(crate) enum Tag {
             }
             Self::meta(meta) => {
                 meta.render_self_closing_to(buf);
+            }
+            Self::title(title) => {
+                title.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</title>".render_to(buf)
             }
             Self::style(style) => {
                 style.render_opening_to(buf);
@@ -308,6 +314,31 @@ pub struct meta {
         })
     }
 } // `link` DOESN'T implement `FnOnce<Children>`
+
+pub struct title {}
+impl title {
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        "<title>".render_to(buf)
+    }
+} impl IntoNode for title {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::title(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for title {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::title(self),
+            children: children.collect(),
+        })
+    }
+}
  
 pub struct style {
     media: Option<Cows>,
