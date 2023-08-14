@@ -76,6 +76,27 @@ impl link {
     }
 }
 
+pub struct meta;
+impl IntoNode for meta {
+    fn into_node(self) -> Node {
+        dom::meta::new().into_node()
+    }
+} // `meta` DOESN'T implement `FnOnce<Children>`
+impl meta {
+    pub fn charset(self, charset: impl IntoCows) -> dom::meta {
+        dom::meta::new().charset(charset)
+    }
+    pub fn content(self, content: impl IntoCows) -> dom::meta {
+        dom::meta::new().content(content)
+    }
+    pub fn http_equiv(self, http_equiv: impl IntoCows) -> dom::meta {
+        dom::meta::new().http_equiv(http_equiv)
+    }
+    pub fn name(self, name: impl IntoCows) -> dom::meta {
+        dom::meta::new().name(name)
+    }
+}
+
 pub struct style;
 impl style {
     pub fn media(self, media: impl IntoCows) -> dom::style {

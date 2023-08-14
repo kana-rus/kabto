@@ -7,6 +7,7 @@ pub(crate) enum Tag {
     html(html),
     head(head),
     link(link),
+    meta(meta),
     style(style),
     body(body),
 
@@ -34,8 +35,10 @@ pub(crate) enum Tag {
                 "</head>".render_to(buf)
             }
             Self::link(link) => {
-                link.render_opening_to(buf);
-                " />".render_to(buf)
+                link.render_self_closing_to(buf);
+            }
+            Self::meta(meta) => {
+                meta.render_self_closing_to(buf);
             }
             Self::style(style) => {
                 style.render_opening_to(buf);
@@ -210,7 +213,7 @@ pub struct link {
     pub(crate) fn new() -> Self {
         Self { as_: None, corsorigin: None, href: None, hreflang: None, imagesizes: None, imagesrcset: None, media: None, rel: None, title: None, type_: None }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_self_closing_to(self, buf: &mut String) {
         let Self { as_, corsorigin, href, hreflang, imagesizes, imagesrcset, media, rel, title, type_ } = self;
         "<link".render_to(buf);
 
@@ -244,6 +247,8 @@ pub struct link {
         if let Some(type_) = type_ {
             " type=".render_to(buf); type_.render_quoted_to(buf)
         }
+
+        " />".render_to(buf)
     }
 } impl IntoNode for link {
     fn into_node(self) -> Node {
@@ -254,6 +259,56 @@ pub struct link {
     }
 } // `link` DOESN'T implement `FnOnce<Children>`
 
+pub struct meta {
+    charset:    Option<Cows>,
+    content:    Option<Cows>,
+    http_equiv: Option<Cows>,
+    name:       Option<Cows>,
+} impl meta {
+    pub fn charset(mut self, charset: impl IntoCows) -> Self {
+        self.charset.replace(charset.into_cows()); self
+    }
+    pub fn content(mut self, content: impl IntoCows) -> Self {
+        self.content.replace(content.into_cows()); self
+    }
+    pub fn http_equiv(mut self, http_equiv: impl IntoCows) -> Self {
+        self.http_equiv.replace(http_equiv.into_cows()); self
+    }
+    pub fn name(mut self, name: impl IntoCows) -> Self {
+        self.name.replace(name.into_cows()); self
+    }
+} impl meta {
+    pub(crate) fn new() -> Self {
+        Self { charset: None, content: None, http_equiv: None, name: None }
+    }
+    fn render_self_closing_to(self, buf: &mut String) {
+        let Self { charset, content, http_equiv, name } = self;
+        "<meta".render_to(buf);
+
+        if let Some(charset) = charset {
+            " charset=".render_to(buf); charset.render_quoted_to(buf)
+        }
+        if let Some(content) = content {
+            " content=".render_to(buf); content.render_quoted_to(buf)
+        }
+        if let Some(http_equiv) = http_equiv {
+            " http-equiv=".render_to(buf); http_equiv.render_quoted_to(buf)
+        }
+        if let Some(name) = name {
+            " name=".render_to(buf); name.render_quoted_to(buf)
+        }
+
+        " />".render_to(buf)
+    }
+} impl IntoNode for meta {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag:      Tag::meta(self),
+            children: vec![]
+        })
+    }
+} // `link` DOESN'T implement `FnOnce<Children>`
+ 
 pub struct style {
     media: Option<Cows>,
     nonce: Option<Cows>,
