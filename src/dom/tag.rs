@@ -6,6 +6,7 @@ use super::{components::{AnkerTarget, AnkerRel}, Node, Element, BaseAttributes};
 pub(crate) enum Tag {
     html(html),
     head(head),
+    style(style),
     body(body),
 
     a(a),
@@ -31,6 +32,16 @@ pub(crate) enum Tag {
                 for c in children {c.render_to(buf)}
                 "</head>".render_to(buf)
             }
+            Self::style(style) => {
+                style.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</style>".render_to(buf)
+            }
+            Self::body(body) => {
+                body.render_opening_to(buf);
+                for c in children {c.render_to(buf)}
+                "</body>".render_to(buf)
+            }
 
             Self::a(a) => {
                 a.render_opening_to(buf);
@@ -52,11 +63,6 @@ pub(crate) enum Tag {
                 div.render_opening_to(buf);
                 for c in children {c.render_to(buf)}
                 "</div>".render_to(buf)
-            }
-            Self::body(body) => {
-                body.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</body>".render_to(buf)
             }
             Self::header(header) => {
                 header.render_opening_to(buf);
@@ -143,6 +149,71 @@ impl IntoNode for head {
             children: vec![],
         })
     }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for head {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::head(self),
+            children: children.collect(),
+        })
+    }
+}
+
+pub struct style {
+    media: Option<Cows>,
+    nonce: Option<Cows>,
+    title: Option<Cows>,
+} impl style {
+    pub fn media(mut self, media: impl IntoCows) -> Self {
+        self.media.replace(media.into_cows());
+        self
+    }
+    pub fn nonce(mut self, nonce: impl IntoCows) -> Self {
+        self.nonce.replace(nonce.into_cows());
+        self
+    }
+    pub fn title(mut self, title: impl IntoCows) -> Self {
+        self.title.replace(title.into_cows());
+        self
+    }
+} impl style {
+    pub(crate) fn new() -> Self {
+        Self { media: None, nonce: None, title: None }
+    }
+    fn render_opening_to(self, buf: &mut String) {
+        let Self { media, nonce, title } = self;
+        "<style".render_to(buf);
+
+        if let Some(media) = media {
+            " media=".render_to(buf);
+            media.render_quoted_to(buf);
+        }
+        if let Some(nonce) = nonce {
+            " nonce=".render_to(buf);
+            nonce.render_quoted_to(buf);
+        }
+        if let Some(title) = title {
+            " title=".render_to(buf);
+            title.render_quoted_to(buf);
+        }
+
+        buf.push('>')
+    }
+} impl IntoNode for style {
+    fn into_node(self) -> Node {
+        Node::Element(Element {
+            tag: Tag::style(self),
+            children: vec![],
+        })
+    }
+} impl<Children: NodeCollection + Tuple> FnOnce<Children> for style {
+    type Output = Node;
+    extern "rust-call" fn call_once(self, children: Children) -> Self::Output {
+        Node::Element(Element {
+            tag: Tag::style(self),
+            children: children.collect(),
+        })
+    }
 }
 
 
@@ -161,8 +232,8 @@ pub struct a {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl a {
@@ -244,8 +315,8 @@ pub struct p {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl p {
@@ -286,8 +357,8 @@ pub struct span {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl span {
@@ -330,8 +401,8 @@ pub struct div {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl div {
@@ -372,8 +443,8 @@ pub struct header {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl header {
@@ -414,8 +485,8 @@ pub struct body {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl body {
@@ -456,8 +527,8 @@ pub struct h1 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h1 {
@@ -498,8 +569,8 @@ pub struct h2 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h2 {
@@ -540,8 +611,8 @@ pub struct h3 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h3 {
@@ -582,8 +653,8 @@ pub struct h4 {
         self.__base.id.replace(id.into_cows());
         self
     }
-    pub fn style(mut self, style: impl IntoCows) -> Self {
-        self.__base.style.replace(style.into_cows());
+    pub fn style(mut self, css: impl IntoCows) -> Self {
+        self.__base.style.replace(css.into_cows());
         self
     }
 } impl h4 {
