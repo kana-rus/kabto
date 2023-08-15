@@ -1,108 +1,34 @@
 use std::marker::Tuple;
 use crate::{library::{Cows, IntoCows}, component::{NodeCollection, IntoNode}};
-use super::{components::{AnkerTarget, AnkerRel}, Node, Element, BaseAttributes};
+use super::{Node, Element, BaseAttributes};
+
 
 
 pub(crate) enum Tag {
-    html(html),
-    head(head),
-    link(link),
-    meta(meta),
-    title(title),
-    style(style),
-    body(body),
-
-    a(a),
-    p(p),
-    span(span),
-
-    div(div),
-    header(header),
-    h1(h1),
-    h2(h2),
-    h3(h3),
-    h4(h4),
+    html(html), head(head), link(link), meta(meta), title(title), style(style), body(body),
+    div(div), header(header), h1(h1), h2(h2), h3(h3), h4(h4),
+    a(a), p(p), span(span),
 } impl Tag {
     pub(crate) fn render_with_children(self, children: Vec<Node>, buf: &mut String) {
         match self {
-            Self::html(html) => {
-                html.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</html>".render_to(buf)
-            }
-            Self::head(head) => {
-                head.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</head>".render_to(buf)
-            }
-            Self::link(link) => {
-                link.render_self_closing_to(buf);
-            }
-            Self::meta(meta) => {
-                meta.render_self_closing_to(buf);
-            }
-            Self::title(title) => {
-                title.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</title>".render_to(buf)
-            }
-            Self::style(style) => {
-                style.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</style>".render_to(buf)
-            }
-            Self::body(body) => {
-                body.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</body>".render_to(buf)
-            }
+            Self::html(html)   => html.render_with_children_to(children, buf),
+            Self::head(head)   => head.render_with_children_to(children, buf),
+            Self::link(link)   => link.render_self_closing_to(buf),
+            Self::meta(meta)   => meta.render_self_closing_to(buf),
+            Self::title(title) => title.render_with_children_to(children, buf),
+            Self::style(style) => style.render_with_children_to(children, buf),
+            Self::body(body)   => body.render_with_children_to(children, buf),
 
-            Self::a(a) => {
-                a.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</a>".render_to(buf)
-            }
-            Self::p(p) => {
-                p.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</p>".render_to(buf)
-            }
-            Self::span(span) => {
-                span.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</span>".render_to(buf)
-            }
+            Self::div(div) => div.render_with_children_to(children, buf),
+            Self::header(header) => header.render_with_children_to(children, buf),
+            Self::h1(h1) => h1.render_with_children_to(children, buf),
+            Self::h2(h2) => h2.render_with_children_to(children, buf),
+            Self::h3(h3) => h3.render_with_children_to(children, buf),
+            Self::h4(h4) => h4.render_with_children_to(children, buf),
 
-            Self::div(div) => {
-                div.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</div>".render_to(buf)
-            }
-            Self::header(header) => {
-                header.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</header>".render_to(buf)
-            }
-            Self::h1(h1) => {
-                h1.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</h1>".render_to(buf)
-            }
-            Self::h2(h2) => {
-                h2.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</h2>".render_to(buf)
-            }
-            Self::h3(h3) => {
-                h3.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</h3>".render_to(buf)
-            }
-            Self::h4(h4) => {
-                h4.render_opening_to(buf);
-                for c in children {c.render_to(buf)}
-                "</h4>".render_to(buf)
-            }
+            Self::a(a) => a.render_with_children_to(children, buf),
+            Self::p(p) => p.render_with_children_to(children, buf),
+            Self::span(span) => span.render_with_children_to(children, buf),
         }
     }
 }
@@ -119,7 +45,7 @@ pub struct html {
     pub(crate) fn new() -> Self {
         Self { lang: None }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { lang } = self;
         "<html".render_to(buf);
 
@@ -128,7 +54,13 @@ pub struct html {
             lang.render_quoted_to(buf)
         }
 
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</html>".render_to(buf)
     }
 } impl IntoNode for html {
     fn into_node(self) -> Node {
@@ -152,11 +84,14 @@ impl head {
     pub(crate) fn new() -> Self {
         Self {}
     }
-    fn render_opening_to(self, buf: &mut String) {
-        "<head>".render_to(buf)
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
+        "<head>".render_to(buf);
+        for c in children {
+            c.render_to(buf)
+        }
+        "</head>".render_to(buf)
     }
-}
-impl IntoNode for head {
+} impl IntoNode for head {
     fn into_node(self) -> Node {
         Node::Element(Element {
             tag: Tag::head(self),
@@ -320,8 +255,12 @@ impl title {
     pub(crate) fn new() -> Self {
         Self {}
     }
-    fn render_opening_to(self, buf: &mut String) {
-        "<title>".render_to(buf)
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
+        "<title>".render_to(buf);
+        for c in children {
+            c.render_to(buf)
+        }
+        "</title>".render_to(buf)
     }
 } impl IntoNode for title {
     fn into_node(self) -> Node {
@@ -361,7 +300,7 @@ pub struct style {
     pub(crate) fn new() -> Self {
         Self { media: None, nonce: None, title: None }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { media, nonce, title } = self;
         "<style".render_to(buf);
 
@@ -378,7 +317,13 @@ pub struct style {
             title.render_quoted_to(buf);
         }
 
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</style>".render_to(buf)
     }
 } impl IntoNode for style {
     fn into_node(self) -> Node {
@@ -402,8 +347,8 @@ pub struct a {
     pub(crate) __base:   BaseAttributes,    
     pub(crate) href:     Option<Cows>,
     pub(crate) download: Option<Cows>,
-    pub(crate) target:   Option<AnkerTarget>,
-    pub(crate) rel:      Option<AnkerRel>,
+    pub(crate) target:   Option<Cows>,
+    pub(crate) rel:      Option<Cows>,
 } impl a {
     pub fn class(mut self, class: impl IntoCows) -> Self {
         self.__base.class.replace(class.into_cows());
@@ -427,11 +372,11 @@ pub struct a {
         self
     }
     pub fn target(mut self, target: impl IntoCows) -> Self {
-        self.target.replace(AnkerTarget::from_str(&target.into_cows()));
+        self.target.replace(target.into_cows());
         self
     }
     pub fn rel(mut self, rel: impl IntoCows) -> Self {
-        self.rel.replace(AnkerRel::from_str(&rel.into_cows()));
+        self.rel.replace(rel.into_cows());
         self
     }
 } impl a {
@@ -444,7 +389,7 @@ pub struct a {
             rel:      None,
         }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base, href, download, target, rel } = self;
         "<a".render_to(buf);
         __base.render_to(buf);
@@ -459,14 +404,20 @@ pub struct a {
         }
         if let Some(t) = target {
             " target=".render_to(buf);
-            t.as_str().render_quoted_to(buf)
+            t.render_quoted_to(buf)
         }
         if let Some(r) = rel {
             " rel=".render_to(buf);
-            r.as_str().render_quoted_to(buf)
+            r.render_quoted_to(buf)
         }
 
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</a>".render_to(buf)
     }
 } impl IntoNode for a {
     fn into_node(self) -> Node {
@@ -504,11 +455,17 @@ pub struct p {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<p".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</p>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for p {
     type Output = Node;
@@ -546,11 +503,17 @@ pub struct span {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<span".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</span>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for span {
     type Output = Node;
@@ -590,11 +553,17 @@ pub struct div {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<div".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</div>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for div {
     type Output = Node;
@@ -632,11 +601,17 @@ pub struct header {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<header".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</header>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for header {
     type Output = Node;
@@ -674,11 +649,17 @@ pub struct body {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<body".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</body>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for body {
     type Output = Node;
@@ -716,11 +697,17 @@ pub struct h1 {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<h1".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</h1>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h1 {
     type Output = Node;
@@ -758,11 +745,17 @@ pub struct h2 {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<h2".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</h2>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h2 {
     type Output = Node;
@@ -800,11 +793,17 @@ pub struct h3 {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<h3".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</h3>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h3 {
     type Output = Node;
@@ -842,11 +841,17 @@ pub struct h4 {
     pub(crate) fn new() -> Self {
         Self { __base: BaseAttributes::new() }
     }
-    fn render_opening_to(self, buf: &mut String) {
+    fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
         let Self { __base } = self;
         "<h4".render_to(buf);
         __base.render_to(buf);
-        buf.push('>')
+        buf.push('>');
+
+        for c in children {
+            c.render_to(buf)
+        }
+
+        "</h4>".render_to(buf)
     }
 } impl<Children: NodeCollection + Tuple> FnOnce<Children> for h4 {
     type Output = Node;

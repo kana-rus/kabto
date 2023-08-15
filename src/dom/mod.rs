@@ -1,4 +1,3 @@
-mod components;
 mod base;
 mod tag;
 #[cfg(test)] mod _test;
