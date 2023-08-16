@@ -1,6 +1,6 @@
 use quote::{quote, format_ident};
 use proc_macro2::TokenStream;
-use crate::define_tags::model::{Tags, Tag, Attribute, BaseAttributes};
+use crate::define_tags::model::{Tags, Tag, Attribute, GlobalAttributes};
 
 
 impl Tags {
@@ -45,12 +45,12 @@ impl Tags {
 
 impl Tag {
     fn expand_for_dom(&self) -> TokenStream {
-        let Self { name, with_base, with_children, own_attributes } = self;
+        let Self { name, with_global, with_children, own_attributes } = self;
 
         let mut attributes = own_attributes.iter().map(|Attribute { name, .. }| quote! {
             pub(crate) #name: Option<Cows>,
-        }).collect::<Vec<_>>(); if *with_base {attributes.push(quote! {
-            pub(crate) __base: BaseAttributes,
+        }).collect::<Vec<_>>(); if *with_global {attributes.push(quote! {
+            pub(crate) __global: GlobalAttributes,
         })}
 
         let mut methods = own_attributes.iter().map(|Attribute { name, argument_name }| quote! [
@@ -58,11 +58,11 @@ impl Tag {
                         self.#name.replace(#argument_name.into_cows());
                         self
                     }
-        ]).collect::<Vec<_>>(); if *with_base {
-            methods.append(&mut BaseAttributes().iter().map(|Attribute { name, argument_name }| {
+        ]).collect::<Vec<_>>(); if *with_global {
+            methods.append(&mut GlobalAttributes().iter().map(|Attribute { name, argument_name }| {
                 let name = format_ident!("{name}"); quote! [
                     pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
-                        self.__base.#name.replace(#argument_name.into_cows());
+                        self.__global.#name.replace(#argument_name.into_cows());
                         self
                     }
                 ]
@@ -71,16 +71,16 @@ impl Tag {
 
         let mut new_attributes = own_attributes.iter().map(|Attribute { name, .. }| quote!{
             #name: None,
-        }).collect::<Vec<_>>(); if *with_base {new_attributes.push(quote!{
-            __base: BaseAttributes::new(),
+        }).collect::<Vec<_>>(); if *with_global {new_attributes.push(quote!{
+            __global: GlobalAttributes::new(),
         })}
 
         let mut renderer = TokenStream::new();
         renderer.extend({
             let mut attributes = own_attributes.iter().map(|Attribute { name, .. }| quote!{
                 #name,
-            }).collect::<Vec<_>>(); if *with_base {attributes.push(quote! {
-                __base
+            }).collect::<Vec<_>>(); if *with_global {attributes.push(quote! {
+                __global
             })}
             quote!{
                 let Self { #( #attributes )* } = self;
@@ -93,8 +93,8 @@ impl Tag {
             }
         });
         renderer.extend({
-            with_base.then_some(quote! {
-                __base.render_to(buf);
+            with_global.then_some(quote! {
+                __global.render_to(buf);
             })
         });
         renderer.extend({
@@ -134,7 +134,7 @@ impl Tag {
             });
 
             renderer = quote! {
-                fn render_self_closing_to(buf: &mut String) {
+                fn render_self_closing_to(self, buf: &mut String) {
                     #renderer
                 }
             }

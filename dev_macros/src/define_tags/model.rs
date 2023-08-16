@@ -3,7 +3,7 @@ use quote::format_ident;
 use syn::{punctuated::Punctuated, parse::Parse, token, Token, bracketed, parenthesized};
 
 
-#[allow(non_snake_case)] pub fn BaseAttributes() -> Vec<Attribute> {
+#[allow(non_snake_case)] pub fn GlobalAttributes() -> Vec<Attribute> {
     vec![
         Attribute {
             name:          format_ident!("class"),
@@ -21,7 +21,7 @@ use syn::{punctuated::Punctuated, parse::Parse, token, Token, bracketed, parenth
 }
 
 mod keywords {
-    syn::custom_keyword!(base);
+    syn::custom_keyword!(global);
     syn::custom_keyword!(children);
 }
 
@@ -37,21 +37,21 @@ pub struct Tags {
 
 pub struct Tag {
     pub name:           Ident,
-    pub with_base:      bool,
+    pub with_global:    bool,
     pub with_children:  bool,
     pub own_attributes: Vec<Attribute>,
 } impl Parse for Tag {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let name: Ident = input.parse()?;
 
-        let mut with_base    = false;
+        let mut with_global   = false;
         let mut with_children = false;
         while input.peek(Token!(@)) {
             input.parse::<Token!(@)>().unwrap();
 
-            if input.peek(keywords::base) {
-                input.parse::<keywords::base>().unwrap();
-                with_base = true
+            if input.peek(keywords::global) {
+                input.parse::<keywords::global>().unwrap();
+                with_global = true
             } else if input.peek(keywords::children) {
                 input.parse::<keywords::children>().unwrap();
                 with_children = true
@@ -64,7 +64,7 @@ pub struct Tag {
             .into_iter()
             .collect::<Vec<_>>();
 
-        Ok(Self {name, with_base, with_children, own_attributes })
+        Ok(Self {name, with_global, with_children, own_attributes })
     }
 }
 

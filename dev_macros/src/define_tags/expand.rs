@@ -12,11 +12,20 @@ impl Tags {
         let expanded_for_component = self.expand_for_component();
 
         quote! {
-            mod dom {
+            pub(crate) mod dom {
+                use std::marker::Tuple;
+                use super::{GlobalAttributes};
+                use crate::{Element, Node, IntoNode};
+                use crate::_library::{NodeCollection, Cows, IntoCows};
+
                 #expanded_for_dom
             }
 
-            mod component {
+            pub(crate) mod component {
+                use std::marker::Tuple;
+                use crate::{Element, Node, IntoNode, Tag};
+                use crate::_library::{NodeCollection, Cows, IntoCows};
+
                 #expanded_for_component
             }
         }

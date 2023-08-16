@@ -1,38 +1,5 @@
-#[cfg(test)] mod _test;
-pub mod tag;
-
-use crate::{
-    library::{IntoCows},
-    dom::{Node, Element},
-};
-
-
-pub trait Component {
-    fn render(self) -> impl HTML;
-}
-
-pub trait HTML {
-    fn render_to(self, buf: &mut String);
-} const _: () = {
-    impl<NC: NodeCollection> HTML for NC {
-        fn render_to(self, buf: &mut String) {
-            for node in self.collect() {
-                node.render_to(buf)
-            }
-        }
-    }
-};const _: () = {
-    impl HTML for &str {
-        fn render_to(self, buf: &mut String) {
-            buf.push_str(self)
-        }
-    }
-    impl HTML for String {
-        fn render_to(self, buf: &mut String) {
-            buf.push_str(&self)
-        }
-    }
-};
+use crate::{Node, Element};
+use super::{IntoCows};
 
 
 pub trait IntoNode {
@@ -65,7 +32,6 @@ pub trait IntoNode {
         }
     }
 };
-
 
 pub trait NodeCollection {
     fn collect(self) -> Vec<Node>;
