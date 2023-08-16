@@ -95,24 +95,6 @@ pub trait IntoCows: Sized {
 };
 
 
-pub(crate) trait Optional<T> {
-    fn into_option(self) -> Option<T>;
-} const _: () = {
-    impl<T> Optional<T> for T {
-        fn into_option(self) -> Option<T> {
-            Some(self)
-        }
-    }
-
-    impl<T> Optional<T> for Option<T> {
-        fn into_option(self) -> Option<T> {
-            self
-        }
-    }
-};
-
-
-
 #[test]
 fn test_escape() {
     let case = "Hello, world!";

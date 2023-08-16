@@ -1,4 +1,10 @@
+[workspace]
+members = [".", "dev_macros"]
+
 [package]
 name       = "kabto"
 version    = "0.1.0"
 edition    = "2021"
+
+[dependencies]
+dev_macros = { version = "0.1.0", path = "dev_macros" }
