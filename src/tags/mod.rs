@@ -32,7 +32,7 @@ dev_macros::define_tags! {
     link [as_, corsorigin, href, hreflang, imagesize, imagesrcset, media, rel, title(alternative_stylesheet), type_];
     meta [charset, content, http_equiv, name];
     title @children [];
-    style [media, nonce, title(alternative_stylesheet)];
+    style @children [media, nonce, title(alternative_stylesheet)];
     a @global @children [href, download, target, rel];
     p @global @children [];
     span @global @children [];
