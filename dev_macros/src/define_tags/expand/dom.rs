@@ -1,27 +1,13 @@
-use super::{Expand, BASE_ATTRIBUTES};
 use quote::{quote, format_ident};
-use proc_macro2::{Ident, TokenStream};
-use syn::{punctuated::Punctuated, parse::Parse, Token, bracketed};
+use proc_macro2::TokenStream;
+use crate::define_tags::model::{Tags, Tag, Attribute, BaseAttributes};
 
 
-mod keywords {
-    syn::custom_keyword!(base);
-    syn::custom_keyword!(children);
-}
-
-pub struct Tags {
-    tags: Punctuated<Tag, Token!(;)>,
-} impl Parse for Tags {
-    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        Ok(Self {
-            tags: input.parse_terminated(Tag::parse)?
-        })
-    }
-} impl Expand for Tags {
-    fn expand(&self) -> TokenStream {
+impl Tags {
+    pub(super) fn expand_for_dom(&self) -> TokenStream {
         let Self { tags } = self;
 
-        let definitions = tags.into_iter().map(Tag::expand);
+        let definitions = tags.into_iter().map(Tag::expand_for_dom);
 
         let tag_declarations = tags.iter().map(|Tag { name, .. }| quote! {
             #name(#name),
@@ -57,65 +43,33 @@ pub struct Tags {
     }
 }
 
-struct Tag {
-    name:           Ident,
-    with_base:      bool,
-    with_children:  bool,
-    own_attributes: Vec<Ident>,
-} impl Parse for Tag {
-    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let name: Ident = input.parse()?;
-
-        let mut with_base    = false;
-        let mut with_children = false;
-        while input.peek(Token!(@)) {
-            input.parse::<Token!(@)>().unwrap();
-
-            if input.peek(keywords::base) {
-                input.parse::<keywords::base>().unwrap();
-                with_base = true
-            } else if input.peek(keywords::children) {
-                input.parse::<keywords::children>().unwrap();
-                with_children = true
-            }
-        }
-
-        let own_attributes; bracketed!(own_attributes in input);
-        let own_attributes = own_attributes
-            .parse_terminated::<_, Token!(,)>(Ident::parse)?
-            .into_iter()
-            .collect::<Vec<_>>();
-
-        Ok(Self {name, with_base, with_children, own_attributes })
-    }
-} impl Expand for Tag {
-    fn expand(&self) -> TokenStream {
+impl Tag {
+    fn expand_for_dom(&self) -> TokenStream {
         let Self { name, with_base, with_children, own_attributes } = self;
 
-        let mut attributes = own_attributes.iter().map(|name| quote! {
+        let mut attributes = own_attributes.iter().map(|Attribute { name, .. }| quote! {
             pub(crate) #name: Option<Cows>,
         }).collect::<Vec<_>>(); if *with_base {attributes.push(quote! {
             pub(crate) __base: BaseAttributes,
         })}
 
-        let mut methods = own_attributes.iter().map(|name| quote! [
-                    pub fn #name(mut self, #name: impl IntoCows) -> Self {
-                        self.#name.replace(#name.into_cows());
+        let mut methods = own_attributes.iter().map(|Attribute { name, argument_name }| quote! [
+                    pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
+                        self.#name.replace(#argument_name.into_cows());
                         self
                     }
         ]).collect::<Vec<_>>(); if *with_base {
-            attributes.append(&mut BASE_ATTRIBUTES.iter().map(|name| {
-                let name = format_ident!("{name}");
-                quote! [
-                    pub fn #name(mut self, #name: impl IntoCows) -> Self {
-                        self.__base.#name.replace(#name.into_cows());
+            methods.append(&mut BaseAttributes().iter().map(|Attribute { name, argument_name }| {
+                let name = format_ident!("{name}"); quote! [
+                    pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
+                        self.__base.#name.replace(#argument_name.into_cows());
                         self
                     }
                 ]
             }).collect::<Vec<_>>())
         }
 
-        let mut new_attributes = own_attributes.iter().map(|name| quote!{
+        let mut new_attributes = own_attributes.iter().map(|Attribute { name, .. }| quote!{
             #name: None,
         }).collect::<Vec<_>>(); if *with_base {new_attributes.push(quote!{
             __base: BaseAttributes::new(),
@@ -123,7 +77,7 @@ struct Tag {
 
         let mut renderer = TokenStream::new();
         renderer.extend({
-            let mut attributes = own_attributes.iter().map(|name| quote!{
+            let mut attributes = own_attributes.iter().map(|Attribute { name, .. }| quote!{
                 #name,
             }).collect::<Vec<_>>(); if *with_base {attributes.push(quote! {
                 __base
@@ -144,7 +98,7 @@ struct Tag {
             })
         });
         renderer.extend({
-            let render_attrs = own_attributes.iter().map(|name| {
+            let render_attrs = own_attributes.iter().map(|Attribute { name, .. }| {
                 let key = format!(" {}=", name.to_string().replace('_', "-"));
                 quote! {
                     if let Some(value) = #name {
