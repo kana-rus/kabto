@@ -86,7 +86,7 @@ dev_macros::define_tags! {
     circle [d, fill, stroke];
 
     /* scripting */
-    canvas @global @children [];
+    canvas @global @children [ height, width];
     script @global @children [crossorigin, integrity, nomodule, nonce, referrerpolicy, src, type_];
 
     /* forms */
