@@ -5,7 +5,7 @@ dev_macros::define_tags! {
 
     /* document metadata */
     head            [];
-    link            [as_, corsorigin, href, hreflang, imagesize, imagesrcset, media, rel, title(alternative_stylesheet), type_];
+    link            [as_, crossorigin, href, hreflang, imagesize, imagesrcset, media, rel, title(alternative_stylesheet), type_];
     meta            [charset, content, http_equiv, name];
     style @children [media, nonce, title(alternative_stylesheet)];
     title @children [];
@@ -39,15 +39,15 @@ dev_macros::define_tags! {
     ul         @global @children [];
 
     /* inline text semantics */
-    a      @global @children [href, download, target, rel];
+    a      @global @children [download, href, hreflang, ping, referrerpolicy, rel, target, type_];
     code   @global @children [];
     span   @global @children [];
     strong @global @children [];
 
     /* image and multimedia */
-    audio @global @children [autoplay, controls, crossorigin, loop_, muted, preload, src];
-    img   @global @children [alt, crossorigin, decoding, elementtiming, height, ismap, loading, referrerpolicy, sizes, src, srcset, width, usemap];
-    video @global @children [autoplay, controls, crossorigin, height, loop_, muted, playsinline, poster, preload, src, width];
+    audio @global @children (autoplay, loop_, muted) [controls, crossorigin, preload, src];
+    img   @global @children (ismap)                  [alt, crossorigin, decoding, elementtiming, height, loading, referrerpolicy, sizes, src, srcset, width, usemap];
+    video @global @children (autoplay, loop_, muted) [controls, crossorigin, height, playsinline, poster, preload, src, width];
 
     /* embedded content */
     iframe @global @children [allow, allowfullscreen, height, loading, name, referrerpolicy, sandbox, src, srcdoc, width];
@@ -58,13 +58,13 @@ dev_macros::define_tags! {
     circle                   [d, fill, stroke];
 
     /* scripting */
-    canvas @global @children [height, width];
-    script @global @children [crossorigin, integrity, nomodule, nonce, referrerpolicy, src, type_];
+    canvas @global @children                 [height, width];
+    script @global @children (async_, defer) [crossorigin, integrity, nomodule, nonce, referrerpolicy, src, type_];
 
     /* forms */
-    button   @global @children [form(ancestor_form), formaction, formenctype, formmethod, formnovalidate, formtarget, name, popovertarget, popovertargetaction, type_, value];
-    form     @global @children [autocomplete, name, rel, action, enctype, method, novalidate, target];
-    input    @global @children [accept, alt, autocomplete, capture, dirname, form(ancestor_form), formaction, formenctype, formmethod, formnovalidate, formtarget, height, inputmode, list, max, maxlength, min, minlength, name, pattern, placeholder, popovertarget, popovertargetaction, size, src, step, type_, value, width];
-    label    @global @children [for_];
-    textarea @global @children [autocomplete, cols, dirname, form(ancestor_form), maxlength, minlength, name, placeholder, rows, spellcheck, wrap];
+    button   @global @children (autofocus, disabled)                     [form(ancestor_form), formaction, formenctype, formmethod, formnovalidate, formtarget, name, popovertarget, popovertargetaction, type_, value];
+    form     @global @children                                           [autocomplete, name, rel, action, enctype, method, novalidate, target];
+    input    @global @children (autofocus, disabled, readonly, required) [accept, alt, autocomplete, capture, dirname, form(ancestor_form), formaction, formenctype, formmethod, formnovalidate, formtarget, height, inputmode, list, max, maxlength, min, minlength, name, pattern, placeholder, popovertarget, popovertargetaction, size, src, step, type_, value, width];
+    label    @global @children                                           [for_];
+    textarea @global @children                                           [autocomplete, cols, dirname, form(ancestor_form), maxlength, minlength, name, placeholder, rows, spellcheck, wrap];
 }

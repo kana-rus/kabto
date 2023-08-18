@@ -50,7 +50,7 @@ impl Tag {
 
         let mut attributes = Vec::with_capacity(n_attributes);
         for BooleanAttribute { name } in boolean_attributes {attributes.push(quote! {
-            pub(crate) #name: boolean,
+            pub(crate) #name: bool,
         })}
         for NormalAttribute { name, .. } in normal_attributes {attributes.push(quote! {
             pub(crate) #name: Option<Cows>,
