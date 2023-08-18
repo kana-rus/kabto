@@ -3,31 +3,14 @@ use quote::format_ident;
 use syn::{punctuated::Punctuated, parse::Parse, token, Token, bracketed, parenthesized};
 
 
-#[allow(non_snake_case)] pub fn GlobalAttributes() -> Vec<Attribute> {
-    vec![
-        Attribute {
-            name:          format_ident!("class"),
-            argument_name: format_ident!("class"),
-        },
-        Attribute {
-            name:          format_ident!("id"),
-            argument_name: format_ident!("id"),
-        },
-        Attribute {
-            name:          format_ident!("style"),
-            argument_name: format_ident!("css"),
-        },
-    ]
-}
-
 mod keywords {
     syn::custom_keyword!(global);
     syn::custom_keyword!(children);
 }
 
-pub struct Tags {
+pub struct Definition {
     pub tags: Punctuated<Tag, Token!(;)>,
-} impl Parse for Tags {
+} impl Parse for Definition {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         Ok(Self {
             tags: input.parse_terminated(Tag::parse)?
@@ -82,4 +65,21 @@ pub struct Attribute {
 
         Ok(Self { name, argument_name })
     }
+}
+
+#[allow(non_snake_case)] pub fn GlobalAttributes() -> Vec<Attribute> {
+    vec![
+        Attribute {
+            name:          format_ident!("class"),
+            argument_name: format_ident!("class"),
+        },
+        Attribute {
+            name:          format_ident!("id"),
+            argument_name: format_ident!("id"),
+        },
+        Attribute {
+            name:          format_ident!("style"),
+            argument_name: format_ident!("css"),
+        },
+    ]
 }

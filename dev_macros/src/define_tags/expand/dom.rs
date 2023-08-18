@@ -1,9 +1,9 @@
 use quote::{quote, format_ident};
 use proc_macro2::TokenStream;
-use crate::define_tags::model::{Tags, Tag, Attribute, GlobalAttributes};
+use crate::define_tags::model::{Definition, Tag, Attribute, GlobalAttributes};
 
 
-impl Tags {
+impl Definition {
     pub(super) fn expand_for_dom(&self) -> TokenStream {
         let Self { tags } = self;
 

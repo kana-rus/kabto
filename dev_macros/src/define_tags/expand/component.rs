@@ -1,9 +1,9 @@
 use quote::quote;
 use proc_macro2::TokenStream;
-use crate::define_tags::model::{Tags, Tag, Attribute, GlobalAttributes};
+use crate::define_tags::model::{Definition, Tag, Attribute, GlobalAttributes};
 
 
-impl Tags {
+impl Definition {
     pub(super) fn expand_for_component(&self) -> TokenStream {
         let Self { tags } = self;
         let definitions = tags.into_iter().map(Tag::expand_for_component);
