@@ -11,8 +11,9 @@ mod define_tags;
 ///     title @children [];
 ///     style @children [media, nonce, title];
 ///     a @global @children [href, download, target, rel];
-///     p @global [];
-///     span @global [];
+///     p @global @children [];
+///     span @global @children [];
+///     input @global @children (autocomplete, ...) [accept, alt, autocomplete, ...];
 /// 
 ///     // ...
 /// }

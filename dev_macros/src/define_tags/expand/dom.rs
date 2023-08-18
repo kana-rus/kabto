@@ -1,9 +1,9 @@
-use quote::{quote, format_ident};
+use quote::quote;
 use proc_macro2::TokenStream;
-use crate::define_tags::model::{Tags, Tag, Attribute, GlobalAttributes};
+use crate::define_tags::model::{Definition, Tag, NormalAttribute, BooleanAttribute};
 
 
-impl Tags {
+impl Definition {
     pub(super) fn expand_for_dom(&self) -> TokenStream {
         let Self { tags } = self;
 
@@ -45,45 +45,50 @@ impl Tags {
 
 impl Tag {
     fn expand_for_dom(&self) -> TokenStream {
-        let Self { name, with_global, with_children, own_attributes } = self;
+        let Self { name, with_children, boolean_attributes, normal_attributes, .. } = self;
+        let n_attributes = boolean_attributes.len() + normal_attributes.len();
 
-        let mut attributes = own_attributes.iter().map(|Attribute { name, .. }| quote! {
+        let mut attributes = Vec::with_capacity(n_attributes);
+        for BooleanAttribute { name } in boolean_attributes {attributes.push(quote! {
+            pub(crate) #name: bool,
+        })}
+        for NormalAttribute { name, .. } in normal_attributes {attributes.push(quote! {
             pub(crate) #name: Option<Cows>,
-        }).collect::<Vec<_>>(); if *with_global {attributes.push(quote! {
-            pub(crate) __global: GlobalAttributes,
         })}
 
-        let mut methods = own_attributes.iter().map(|Attribute { name, argument_name }| quote! [
-                    pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
-                        self.#name.replace(#argument_name.into_cows());
-                        self
-                    }
-        ]).collect::<Vec<_>>(); if *with_global {
-            methods.append(&mut GlobalAttributes().iter().map(|Attribute { name, argument_name }| {
-                let name = format_ident!("{name}"); quote! [
-                    pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
-                        self.__global.#name.replace(#argument_name.into_cows());
-                        self
-                    }
-                ]
-            }).collect::<Vec<_>>())
-        }
+        let mut mutations = Vec::with_capacity(n_attributes);
+        for BooleanAttribute { name } in boolean_attributes {mutations.push(quote! {
+            pub fn #name(mut self) -> Self {
+                self.#name = true;
+                self
+            }
+        })}
+        for NormalAttribute { name, argument_name } in normal_attributes {mutations.push(quote! {
+            pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
+                self.#name.replace(#argument_name.into_cows());
+                self
+            }
+        })}
 
-        let mut new_attributes = own_attributes.iter().map(|Attribute { name, .. }| quote!{
+        let mut fields = TokenStream::new();
+        for BooleanAttribute { name } in boolean_attributes {fields.extend(quote! {
+            #name: false,
+        })}
+        for NormalAttribute { name, .. } in normal_attributes {fields.extend(quote! {
             #name: None,
-        }).collect::<Vec<_>>(); if *with_global {new_attributes.push(quote!{
-            __global: GlobalAttributes::new(),
         })}
+        let constructer = quote! {
+            pub(crate) fn new() -> Self {
+                Self { #fields }
+            }
+        };
 
         let mut renderer = TokenStream::new();
         renderer.extend({
-            let mut attributes = own_attributes.iter().map(|Attribute { name, .. }| quote!{
-                #name,
-            }).collect::<Vec<_>>(); if *with_global {attributes.push(quote! {
-                __global
-            })}
+            let booleans = boolean_attributes.iter().map(|BooleanAttribute { name }| quote! { #name });
+            let normals  = normal_attributes .iter().map(|NormalAttribute  { name, .. }| quote! { #name });
             quote!{
-                let Self { #( #attributes )* } = self;
+                let Self { #( #booleans, )* #( #normals, )* } = self;
             }
         });
         renderer.extend({
@@ -93,12 +98,15 @@ impl Tag {
             }
         });
         renderer.extend({
-            with_global.then_some(quote! {
-                __global.render_to(buf);
-            })
-        });
-        renderer.extend({
-            let render_attrs = own_attributes.iter().map(|Attribute { name, .. }| {
+            let render_booleans = boolean_attributes.iter().map(|BooleanAttribute { name }| {
+                let key = format!(" {}", name.to_string().replace('_', "-"));
+                quote! {
+                    if #name {
+                        #key.render_to(buf);
+                    }
+                }
+            });
+            let render_normals = normal_attributes.iter().map(|NormalAttribute { name, .. }| {
                 let key = format!(" {}=", name.to_string().replace('_', "-"));
                 quote! {
                     if let Some(value) = #name {
@@ -107,21 +115,20 @@ impl Tag {
                     }
                 }
             });
-            render_attrs
+            quote! {
+                #( #render_booleans )*
+                #( #render_normals  )*
+            }
         });
         if *with_children {
             let closing = format!("</{}>", name);
-
             renderer.extend(quote! {
                 buf.push('>');
-
                 for c in children {
                     c.render_to(buf)
                 }
-        
                 #closing.render_to(buf)
             });
-
             renderer = quote! {
                 fn render_with_children_to(self, children: Vec<Node>, buf: &mut String) {
                     #renderer
@@ -132,7 +139,6 @@ impl Tag {
             renderer.extend(quote! {
                 " />".render_to(buf)
             });
-
             renderer = quote! {
                 fn render_self_closing_to(self, buf: &mut String) {
                     #renderer
@@ -150,6 +156,7 @@ impl Tag {
                 }
             }
         };
+
         let set_children = with_children.then(|| quote! {
             impl<Children: NodeCollection + Tuple> FnOnce<Children> for #name {
                 type Output = Node;
@@ -167,21 +174,17 @@ impl Tag {
                 #( #attributes )*
             }
 
-            #into_node
-            #set_children
-            
             impl #name {
-                #( #methods )*
-            }
-            
-            impl #name {
-                pub(crate) fn new() -> Self {
-                    Self {
-                        #( #new_attributes )*
-                    }
-                }
+                #constructer
                 #renderer
             }
+
+            impl #name {
+                #( #mutations )*
+            }
+
+            #into_node
+            #set_children
         }
     }
 }
