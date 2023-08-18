@@ -19,10 +19,11 @@ pub struct Definition {
 }
 
 pub struct Tag {
-    pub name:           Ident,
-    pub with_global:    bool,
-    pub with_children:  bool,
-    pub own_attributes: Vec<Attribute>,
+    pub name:               Ident,
+    pub with_global:        bool,
+    pub with_children:      bool,
+    pub boolean_attributes: Vec<BooleanAttribute>,
+    pub normal_attributes:  Vec<NormalAttribute>,
 } impl Parse for Tag {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let name: Ident = input.parse()?;
@@ -41,20 +42,28 @@ pub struct Tag {
             }
         }
 
-        let own_attributes; bracketed!(own_attributes in input);
-        let own_attributes = own_attributes
-            .parse_terminated::<_, Token!(,)>(Attribute::parse)?
-            .into_iter()
-            .collect::<Vec<_>>();
+        let boolean_attributes = if input.peek(token::Paren) {
+            let boolean_attributes; parenthesized!(boolean_attributes in input);
+            boolean_attributes.parse_terminated::<_, Token!(,)>(BooleanAttribute::parse)?
+                .into_iter().collect::<Vec<_>>()
+        } else {Vec::new()};
 
-        Ok(Self {name, with_global, with_children, own_attributes })
+        let normal_attributes; bracketed!(normal_attributes in input);
+        let mut normal_attributes = normal_attributes
+            .parse_terminated::<_, Token!(,)>(NormalAttribute::parse)?
+            .into_iter().collect::<Vec<_>>();
+        if with_global {
+            normal_attributes.append(&mut GlobalAttributes())
+        }
+
+        Ok(Self {name, with_global, with_children, boolean_attributes, normal_attributes })
     }
 }
 
-pub struct Attribute {
+pub struct NormalAttribute {
     pub name:          Ident,
     pub argument_name: Ident,
-} impl Parse for Attribute {
+} impl Parse for NormalAttribute {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let name = input.parse::<Ident>()?;
         let mut argument_name = name.clone();
@@ -65,21 +74,31 @@ pub struct Attribute {
 
         Ok(Self { name, argument_name })
     }
+} impl NormalAttribute {
+    fn new(name: &'static str) -> Self {
+        let name          = format_ident!("{name}");
+        let argument_name = name.clone();
+        Self { name, argument_name }
+    }
+    fn argument(mut self, argument_name: &'static str) -> Self {
+        self.argument_name = format_ident!("{argument_name}");
+        self
+    }
 }
 
-#[allow(non_snake_case)] pub fn GlobalAttributes() -> Vec<Attribute> {
+pub struct BooleanAttribute {
+    pub name: Ident
+} impl Parse for BooleanAttribute {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let name = input.parse()?;
+        Ok(Self { name })
+    }
+}
+
+#[allow(non_snake_case)] pub fn GlobalAttributes() -> Vec<NormalAttribute> {
     vec![
-        Attribute {
-            name:          format_ident!("class"),
-            argument_name: format_ident!("class"),
-        },
-        Attribute {
-            name:          format_ident!("id"),
-            argument_name: format_ident!("id"),
-        },
-        Attribute {
-            name:          format_ident!("style"),
-            argument_name: format_ident!("css"),
-        },
+        NormalAttribute::new("class"),
+        NormalAttribute::new("id"),
+        NormalAttribute::new("style").argument("css"),
     ]
 }

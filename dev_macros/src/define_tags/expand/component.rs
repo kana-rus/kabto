@@ -1,6 +1,6 @@
 use quote::quote;
 use proc_macro2::TokenStream;
-use crate::define_tags::model::{Definition, Tag, Attribute, GlobalAttributes};
+use crate::define_tags::model::{Definition, Tag, GlobalAttributes};
 
 
 impl Definition {
