@@ -63,7 +63,7 @@ impl Tag {
                 self
             }
         })}
-        for NormalAttribute { name, argument_name } in normal_attributes {attributes.push(quote! {
+        for NormalAttribute { name, argument_name } in normal_attributes {mutations.push(quote! {
             pub fn #name(mut self, #argument_name: impl IntoCows) -> Self {
                 self.#name.replace(#argument_name.into_cows());
                 self
