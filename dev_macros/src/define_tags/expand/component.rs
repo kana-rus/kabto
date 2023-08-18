@@ -1,9 +1,9 @@
 use quote::quote;
 use proc_macro2::TokenStream;
-use crate::define_tags::model::{Tags, Tag, Attribute, GlobalAttributes};
+use crate::define_tags::model::{Definition, Tag, BooleanAttribute, NormalAttribute};
 
 
-impl Tags {
+impl Definition {
     pub(super) fn expand_for_component(&self) -> TokenStream {
         let Self { tags } = self;
         let definitions = tags.into_iter().map(Tag::expand_for_component);
@@ -16,18 +16,22 @@ impl Tags {
 
 impl Tag {
     fn expand_for_component(&self) -> TokenStream {
-        let Self { name:tag_name, with_global, with_children, own_attributes } = self;
+        let Self { name:tag_name, with_children, boolean_attributes, normal_attributes, .. } = self;
 
-        let mut methods = own_attributes.iter().map(|Attribute { name, argument_name }| quote! {
-                pub fn #name(self, #argument_name: impl IntoCows) -> super::dom::#tag_name {
+        let mut mutations = TokenStream::new();
+        for BooleanAttribute { name } in boolean_attributes {
+            mutations.extend(quote! {
+                pub fn #name(mut self) -> super::dom::#tag_name {
+                    super::dom::#tag_name::new().#name()
+                }
+            })
+        }
+        for NormalAttribute { name, argument_name } in normal_attributes {
+            mutations.extend(quote! {
+                pub fn #name(mut self, #argument_name: impl IntoCows) -> super::dom::#tag_name {
                     super::dom::#tag_name::new().#name(#argument_name)
                 }
-        }).collect::<Vec<_>>(); if *with_global {
-            methods.append(&mut GlobalAttributes().iter().map(|Attribute { name, argument_name }| quote! {
-                pub fn #name(self, #argument_name: impl IntoCows) -> super::dom::#tag_name {
-                    super::dom::#tag_name::new().#name(#argument_name)
-                }
-            }).collect::<Vec<_>>())
+            })
         }
 
         let into_node = quote! {
@@ -52,11 +56,13 @@ impl Tag {
 
         quote! {
             pub struct #tag_name;
+
+            impl #tag_name {
+                #mutations
+            }
+
             #into_node
             #set_children
-            impl #tag_name {
-                #( #methods )*
-            }
         }
     }
 }
