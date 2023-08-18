@@ -1,31 +1,3 @@
-use crate::_library::{Cows, IntoCows};
-
-
-pub(crate) struct GlobalAttributes {
-    pub(crate) class: Option<Cows>,
-    pub(crate) id:    Option<Cows>,
-    pub(crate) style: Option<Cows>,
-} impl GlobalAttributes {
-    pub(crate) fn new() -> Self {
-        Self { class: None, id: None, style: None }
-    }
-    pub(crate) fn render_to(self, buf: &mut String) {
-        let Self { class, id, style } = self;
-        if let Some(c) = class {  
-            " class=".render_to(buf);
-            c.render_quoted_to(buf)
-        }
-        if let Some(i) = id {
-            " id=".render_to(buf);
-            i.render_quoted_to(buf)
-        }
-        if let Some(s) = style {
-            " style=".render_to(buf);
-            s.render_quoted_to(buf)
-        }
-    }
-}
-
 /* ref: https://developer.mozilla.org/en-US/docs/Web/HTML/Element */
 dev_macros::define_tags! {
     /* main root */

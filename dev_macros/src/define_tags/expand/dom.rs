@@ -70,16 +70,16 @@ impl Tag {
             }
         })}
 
-        let mut constructer = TokenStream::new();
-        for BooleanAttribute { name } in boolean_attributes {constructer.extend(quote! {
+        let mut fields = TokenStream::new();
+        for BooleanAttribute { name } in boolean_attributes {fields.extend(quote! {
             #name: false,
         })}
-        for NormalAttribute { name, .. } in normal_attributes {constructer.extend(quote! {
+        for NormalAttribute { name, .. } in normal_attributes {fields.extend(quote! {
             #name: None,
         })}
-        constructer = quote! {
+        let constructer = quote! {
             pub(crate) fn new() -> Self {
-                #constructer
+                Self { #fields }
             }
         };
 

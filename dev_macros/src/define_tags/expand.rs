@@ -14,7 +14,6 @@ impl Definition {
         quote! {
             pub(crate) mod dom {
                 use std::marker::Tuple;
-                use super::{GlobalAttributes};
                 use crate::{Element, Node, IntoNode};
                 use crate::_library::{NodeCollection, Cows, IntoCows};
 
