@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "dev_macros"]
+members    = [".", "dev_macros"]
 
 [package]
 name       = "kabto"
@@ -8,3 +8,5 @@ edition    = "2021"
 
 [dependencies]
 dev_macros = { version = "0.1.0", path = "dev_macros" }
+serde      = { version = "1.0", default-features = false }
+serde_json = "1.0"
