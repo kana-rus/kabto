@@ -99,7 +99,7 @@ impl Tag {
         });
         renderer.extend({
             let render_booleans = boolean_attributes.iter().map(|BooleanAttribute { name }| {
-                let key = format!(" {}", name.to_string().replace('_', "-"));
+                let key = format!(" {}", name.to_string().trim_end_matches('_').replace('_', "-"));
                 quote! {
                     if #name {
                         #key.render_to(buf);
@@ -107,7 +107,7 @@ impl Tag {
                 }
             });
             let render_normals = normal_attributes.iter().map(|NormalAttribute { name, .. }| {
-                let key = format!(" {}=", name.to_string().replace('_', "-"));
+                let key = format!(" {}=", name.to_string().trim_end_matches('_').replace('_', "-"));
                 quote! {
                     if let Some(value) = #name {
                         #key.render_to(buf);
