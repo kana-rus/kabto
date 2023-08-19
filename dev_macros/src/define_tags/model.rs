@@ -48,10 +48,11 @@ pub struct Tag {
                 .into_iter().collect::<Vec<_>>()
         } else {Vec::new()};
 
-        let normal_attributes; bracketed!(normal_attributes in input);
-        let mut normal_attributes = normal_attributes
-            .parse_terminated::<_, Token!(,)>(NormalAttribute::parse)?
-            .into_iter().collect::<Vec<_>>();
+        let mut normal_attributes = if input.peek(token::Bracket) {
+            let normal_attributes; bracketed!(normal_attributes in input);
+            normal_attributes.parse_terminated::<_, Token!(,)>(NormalAttribute::parse)?
+                .into_iter().collect::<Vec<_>>()
+        } else {Vec::new()};
         if with_global {
             normal_attributes.append(&mut GlobalAttributes())
         }

@@ -4,45 +4,45 @@ dev_macros::define_tags! {
     html @children [lang];
 
     /* document metadata */
-    head            [];
+    head            ;
     link            [as_, crossorigin, href, hreflang, imagesize, imagesrcset, media, rel, title(alternative_stylesheet), type_];
     meta            [charset, content, http_equiv, name];
     style @children [media, nonce, title(alternative_stylesheet)];
-    title @children [];
+    title @children ;
 
     /* sectioning root */
-    body @global @children [];
+    body @global @children;
 
     /* content sectioning */
-    article @global @children [];
-    aside   @global @children [];
-    footer  @global @children [];
-    header  @global @children [];
-    h1      @global @children [];
-    h2      @global @children [];
-    h3      @global @children [];
-    h4      @global @children [];
-    h5      @global @children [];
-    h6      @global @children [];
-    main    @global @children [];
-    nav     @global @children [];
-    section @global @children [];
+    article @global @children;
+    aside   @global @children;
+    footer  @global @children;
+    header  @global @children;
+    h1      @global @children;
+    h2      @global @children;
+    h3      @global @children;
+    h4      @global @children;
+    h5      @global @children;
+    h6      @global @children;
+    main    @global @children;
+    nav     @global @children;
+    section @global @children;
 
     /* text content */
-    blockquote @global @children [];
-    div        @global @children [];
-    li         @global @children [];
-    menu       @global @children [];
-    ol         @global @children [];
-    p          @global @children [];
-    pre        @global @children [];
-    ul         @global @children [];
+    blockquote @global @children;
+    div        @global @children;
+    li         @global @children;
+    menu       @global @children;
+    ol         @global @children;
+    p          @global @children;
+    pre        @global @children;
+    ul         @global @children;
 
     /* inline text semantics */
     a      @global @children [download, href, hreflang, ping, referrerpolicy, rel, target, type_];
-    code   @global @children [];
-    span   @global @children [];
-    strong @global @children [];
+    code   @global @children;
+    span   @global @children;
+    strong @global @children;
 
     /* image and multimedia */
     audio @global @children (autoplay, loop_, muted) [controls, crossorigin, preload, src];
@@ -60,6 +60,18 @@ dev_macros::define_tags! {
     /* scripting */
     canvas @global @children                 [height, width];
     script @global @children (async_, defer) [crossorigin, integrity, nomodule, nonce, referrerpolicy, src, type_];
+
+    /* table content */
+    caption  @global @children;
+    col      @global           [span(number_of_columns)];
+    colgroup @global @children [span(number_of_columns)];
+    table    @global @children;
+    tbody    @global @children;
+    td       @global @children [colspan, headers, rowspan];
+    tfroot   @global @children [abbr, colspan, headers, rowspan, scope];
+    th       @global @children [abbr, colspan, headers, rowspan, scope];
+    thread   @global @children;
+    tr       @global @children;
 
     /* forms */
     button   @global @children (autofocus, disabled)                     [form(ancestor_form), formaction, formenctype, formmethod, formnovalidate, formtarget, name, popovertarget, popovertargetaction, type_, value];
